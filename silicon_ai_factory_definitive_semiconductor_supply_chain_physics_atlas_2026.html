@@ -3,502 +3,1204 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>SILICON → AI FACTORY · Definitive Semiconductor Supply Chain &amp; Physics Atlas (2026)</title>
+<title>Silicon to AI Factory · Definitive Semiconductor Supply Chain &amp; Physics Atlas (2026)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
-:root{
-  --bg:#060a0f;
-  --bg-grid:rgba(56,189,248,.035);
-  --elev:#0c121b;
-  --panel:#101824;
-  --panel-2:#152030;
-  --ink:#edf3fa;
-  --ink-2:#b6c6d8;
-  --mute:#788da3;
-  --line:#1f2e40;
-  --line-2:#2f445c;
-  --track:#172332;
-  --amber:#f5b73b;
-  --amber-bg:rgba(245,183,59,.13);
-  --cyan:#38bdf8;
-  --cyan-bg:rgba(56,189,248,.12);
-  --emerald:#10b981;
-  --emerald-bg:rgba(16,185,129,.12);
-  --rose:#f43f5e;
-  --rose-bg:rgba(244,63,94,.13);
-  --violet:#a78bfa;
-  --shadow:0 12px 34px rgba(0,0,0,.42);
-  --r:14px;
-  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  --sans:"Inter",system-ui,-apple-system,sans-serif;
-  --disp:"Bricolage Grotesque","Inter",system-ui,sans-serif;
+:root {
+  --bg: #090d15;
+  --elev: #0f1724;
+  --panel: #131d2e;
+  --panel-hover: #18253a;
+  --panel-2: #162235;
+  --border: #23334a;
+  --border-subtle: #1a283b;
+  --border-highlight: #38bdf8;
+  --ink: #f1f5f9;
+  --ink-secondary: #cbd5e1;
+  --mute: #94a3b8;
+  --cyan: #38bdf8;
+  --cyan-bg: rgba(56, 189, 248, 0.12);
+  --cyan-border: rgba(56, 189, 248, 0.35);
+  --amber: #fbbf24;
+  --amber-bg: rgba(251, 191, 36, 0.12);
+  --amber-border: rgba(251, 191, 36, 0.35);
+  --emerald: #34d399;
+  --emerald-bg: rgba(52, 211, 153, 0.12);
+  --emerald-border: rgba(52, 211, 153, 0.35);
+  --rose: #fb7185;
+  --rose-bg: rgba(251, 113, 133, 0.14);
+  --rose-border: rgba(251, 113, 133, 0.4);
+  --violet: #c084fc;
+  --violet-bg: rgba(192, 132, 252, 0.12);
+  --violet-border: rgba(192, 132, 252, 0.35);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 6px 18px -2px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 36px -4px rgba(0, 0, 0, 0.45);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-:root[data-theme="light"]{
-  --bg:#f0f4f8;
-  --bg-grid:rgba(15,29,43,.035);
-  --elev:#e6edf4;
-  --panel:#ffffff;
-  --panel-2:#f7f9fc;
-  --ink:#0d1a26;
-  --ink-2:#2a3d4f;
-  --mute:#5a6d80;
-  --line:#d2dde7;
-  --line-2:#afc0d1;
-  --track:#e2e8f0;
-  --amber:#bf7b00;
-  --amber-bg:rgba(191,123,0,.11);
-  --cyan:#0284c7;
-  --cyan-bg:rgba(2,132,199,.10);
-  --emerald:#059669;
-  --emerald-bg:rgba(5,150,105,.10);
-  --rose:#e11d48;
-  --rose-bg:rgba(225,29,72,.10);
-  --violet:#7c3aed;
-  --shadow:0 8px 24px rgba(13,26,38,.08);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{
-  margin:0;
-  background-color:var(--bg);
-  background-image:linear-gradient(var(--bg-grid) 1px,transparent 1px),linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px);
-  background-size:36px 36px;
-  color:var(--ink);
-  font:400 15px/1.55 var(--sans);
-  overflow-x:hidden;
-  -webkit-font-smoothing:antialiased;
-}
-a{color:var(--cyan);text-decoration:none}
-a:hover{text-decoration:underline}
-button,input,select{font-family:inherit}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-
-.shell{max-width:1320px;margin:0 auto;padding:18px 16px 72px}
-
-/* Command Header */
-.cmd-header{
-  display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:14px;
-  padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px;
-}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;
-  color:var(--cyan);background:var(--cyan-bg);border:1px solid rgba(56,189,248,.32);
-  padding:5px 10px;border-radius:999px;margin-bottom:10px;
-}
-.eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 10px var(--emerald);animation:blink 2.2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
-h1{font:800 clamp(1.85rem,4.2vw,2.95rem)/1.02 var(--disp);letter-spacing:-.035em;margin:0 0 8px}
-.lede{color:var(--mute);max-width:72ch;margin:0;font-size:.93rem}
-.cmd-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.cmd-btn{
-  display:inline-flex;align-items:center;gap:7px;
-  background:var(--panel);color:var(--ink);border:1px solid var(--line-2);
-  border-radius:10px;padding:8px 12px;font-size:.82rem;font-weight:600;cursor:pointer;
-  transition:border-color .15s,background .15s;
-}
-.cmd-btn:hover{border-color:var(--amber)}
-.cmd-btn kbd{
-  font:600 10px/1 var(--mono);background:var(--elev);border:1px solid var(--line-2);
-  padding:2px 5px;border-radius:4px;color:var(--mute);
+:root[data-theme="light"] {
+  --bg: #f8fafc;
+  --elev: #ffffff;
+  --panel: #ffffff;
+  --panel-hover: #f1f5f9;
+  --panel-2: #f1f5f9;
+  --border: #cbd5e1;
+  --border-subtle: #e2e8f0;
+  --border-highlight: #0284c7;
+  --ink: #0f172a;
+  --ink-secondary: #334155;
+  --mute: #475569;
+  --cyan: #0284c7;
+  --cyan-bg: rgba(2, 132, 199, 0.10);
+  --cyan-border: rgba(2, 132, 199, 0.35);
+  --amber: #b45309;
+  --amber-bg: rgba(180, 83, 9, 0.10);
+  --amber-border: rgba(180, 83, 9, 0.35);
+  --emerald: #047857;
+  --emerald-bg: rgba(4, 120, 87, 0.10);
+  --emerald-border: rgba(4, 120, 87, 0.35);
+  --rose: #be123c;
+  --rose-bg: rgba(190, 18, 60, 0.10);
+  --rose-border: rgba(190, 18, 60, 0.35);
+  --violet: #6d28d9;
+  --violet-bg: rgba(109, 40, 217, 0.10);
+  --violet-border: rgba(109, 40, 217, 0.35);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.10);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.12);
 }
 
-/* Telemetry Strip */
-.telem-strip{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px;margin-bottom:16px;
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; overflow-x: hidden; font-size: 15px; }
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums lining-nums;
+  caret-color: var(--amber);
 }
-.telem{
-  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
-  display:flex;flex-direction:column;gap:2px;position:relative;overflow:hidden;
+::selection { background: rgba(56, 189, 248, 0.28); color: var(--ink); }
+a { color: var(--cyan); text-decoration: none; text-underline-offset: 3px; }
+a:hover { text-decoration: underline; }
+button, input, select { font-family: inherit; font-size: 0.88rem; }
+button:focus-visible, input:focus-visible, select:focus-visible, a:focus-visible {
+  outline: 2px solid var(--border-highlight);
+  outline-offset: 2px;
 }
-.telem::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan)}
-.telem.warn::before{background:var(--amber)}
-.telem.crit::before{background:var(--rose)}
-.telem.ok::before{background:var(--emerald)}
-.telem span{font:600 10px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.07em;color:var(--mute)}
-.telem strong{font:700 1.2rem/1.15 var(--mono);color:var(--ink)}
-.telem small{font-size:.74rem;color:var(--mute)}
+scrollbar-width: thin;
+scrollbar-color: var(--border) transparent;
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mute); }
 
-/* Primary Navigation */
-.nav-bar{
-  display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;
-  background:var(--elev);padding:5px;border-radius:12px;border:1px solid var(--line);
-}
-.nav-tab{
-  flex:1 1 auto;min-width:128px;text-align:center;
-  background:transparent;color:var(--mute);border:1px solid transparent;
-  border-radius:9px;padding:9px 12px;font-size:.84rem;font-weight:600;cursor:pointer;
-  transition:all .16s ease;
-}
-.nav-tab:hover{color:var(--ink);background:var(--panel-2)}
-.nav-tab[aria-selected="true"]{
-  background:var(--panel);color:var(--amber);border-color:var(--line-2);
-  box-shadow:0 2px 10px rgba(0,0,0,.22);
+.shell {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 24px 20px 80px;
 }
 
-.view{display:none}
-.view.active{display:block;animation:fadeUp .2s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-
-/* Surface Cards */
-.card{
-  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
-  padding:20px;box-shadow:var(--shadow);margin-bottom:18px;
+/* Header & Status Deck */
+.cmd-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
 }
-.card-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
-.card h2{font:800 clamp(1.22rem,2.4vw,1.62rem)/1.12 var(--disp);letter-spacing:-.02em;margin:0}
-.card h3{font:700 1.02rem/1.25 var(--disp);margin:0 0 8px}
-.sub{font-size:.82rem;color:var(--mute);margin:0 0 12px}
+.cmd-title-block { max-width: 820px; }
+h1 {
+  font-size: 2.25rem;
+  line-height: 1.12;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.lede {
+  color: var(--ink-secondary);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+.header-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--mute);
+}
+.meta-tag.highlight {
+  color: var(--emerald);
+  border-color: var(--emerald-border);
+  background: var(--emerald-bg);
+}
+.cmd-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.cmd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+.cmd-btn:hover {
+  border-color: var(--border-highlight);
+  background: var(--panel-hover);
+  transform: translateY(-1px);
+}
+.cmd-btn kbd {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--mute);
+}
+
+/* Telemetry Deck */
+.telem-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.telem {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 13px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.telem:hover {
+  border-color: var(--border-highlight);
+  background: var(--panel-hover);
+  transform: translateY(-2px);
+}
+.telem-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+.telem-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+}
+.telem-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+.telem-badge.crit { color: var(--rose); background: var(--rose-bg); border-color: var(--rose-border); }
+.telem-badge.warn { color: var(--amber); background: var(--amber-bg); border-color: var(--amber-border); }
+.telem-badge.ok { color: var(--emerald); background: var(--emerald-bg); border-color: var(--emerald-border); }
+.telem-badge.cyan { color: var(--cyan); background: var(--cyan-bg); border-color: var(--cyan-border); }
+.telem strong {
+  font-family: var(--mono);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--ink);
+}
+.telem small {
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--mute);
+}
+
+/* Primary Tab Navigation */
+.nav-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+  background: var(--elev);
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+.nav-tab {
+  flex: 1 1 auto;
+  min-width: 140px;
+  text-align: center;
+  background: transparent;
+  color: var(--mute);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.nav-tab:hover {
+  color: var(--ink);
+  background: var(--panel-hover);
+}
+.nav-tab[aria-selected="true"] {
+  background: var(--panel);
+  color: var(--amber);
+  border-color: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+.nav-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--mute);
+}
+.nav-tab[aria-selected="true"] .nav-pill {
+  color: var(--amber);
+  border-color: var(--amber-border);
+}
+
+.view { display: none; }
+.view.active { display: block; animation: viewIn 0.18s ease-out; }
+@keyframes viewIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* Cards & Section Framing */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.card h2 {
+  font-size: 1.45rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+.card h3 {
+  font-size: 1.1rem;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.sub {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  margin: 0 0 14px;
+}
 
 /* Badges & Pills */
-.meta-row{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-bottom:12px}
-.badge{
-  display:inline-flex;align-items:center;gap:5px;font:600 10.5px/1.2 var(--mono);
-  padding:4px 8px;border-radius:6px;border:1px solid var(--line-2);color:var(--mute);background:var(--panel-2);
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 14px;
 }
-.badge.ok{border-color:rgba(16,185,129,.45);color:var(--emerald);background:var(--emerald-bg)}
-.badge.crit{border-color:rgba(244,63,94,.45);color:var(--rose);background:var(--rose-bg)}
-.badge.cyan{border-color:rgba(56,189,248,.4);color:var(--cyan);background:var(--cyan-bg)}
-.badge.amber{border-color:rgba(245,183,59,.45);color:var(--amber);background:var(--amber-bg)}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  line-height: 1.2;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  color: var(--ink-secondary);
+  background: var(--panel-2);
+}
+.badge.ok { border-color: var(--emerald-border); color: var(--emerald); background: var(--emerald-bg); }
+.badge.crit { border-color: var(--rose-border); color: var(--rose); background: var(--rose-bg); }
+.badge.cyan { border-color: var(--cyan-border); color: var(--cyan); background: var(--cyan-bg); }
+.badge.amber { border-color: var(--amber-border); color: var(--amber); background: var(--amber-bg); }
 
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;background:var(--panel);
-  border:1px solid var(--line);border-radius:999px;padding:5px 11px;
-  font-size:.8rem;font-weight:500;color:var(--ink);cursor:pointer;transition:all .14s;
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.14s, background 0.14s;
 }
-.chip:hover{border-color:var(--line-2)}
-.chip[aria-pressed="true"]{border-color:var(--amber);background:var(--amber-bg);font-weight:600}
-.chip s{width:8px;height:8px;border-radius:50%;display:block;flex-shrink:0}
-
-.seg-toggle{
-  display:inline-flex;background:var(--elev);border:1px solid var(--line);border-radius:9px;padding:3px;gap:3px;margin-bottom:12px;flex-wrap:wrap;
+.chip:hover { border-color: var(--border-highlight); }
+.chip[aria-pressed="true"] {
+  border-color: var(--amber-border);
+  background: var(--amber-bg);
+  color: var(--amber);
+  font-weight: 600;
 }
-.seg-btn{
-  border:0;background:transparent;color:var(--mute);padding:6px 11px;border-radius:7px;
-  font-size:.79rem;font-weight:600;cursor:pointer;
+.chip s { width: 8px; height: 8px; border-radius: 50%; display: block; flex-shrink: 0; }
+
+.seg-toggle {
+  display: inline-flex;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
 }
-.seg-btn[aria-pressed="true"]{background:var(--panel);color:var(--amber);box-shadow:0 1px 4px rgba(0,0,0,.22)}
-
-/* Interactive Topology Pipeline */
-.topo-shell{
-  background:var(--elev);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px;
+.seg-btn {
+  border: 0;
+  background: transparent;
+  color: var(--mute);
+  padding: 7px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
 }
-.topo-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
-.topo-grid{
-  display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;position:relative;
-}
-@media (max-width:960px){.topo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:520px){.topo-grid{grid-template-columns:1fr}}
-.t-node{
-  text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:11px;
-  padding:11px 12px;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:6px;
-  position:relative;transition:all .16s ease;
-}
-.t-node:hover{border-color:var(--cyan);transform:translateY(-1px)}
-.t-node[aria-current="true"]{border-color:var(--amber);box-shadow:0 0 0 2px var(--amber)}
-.t-node.dimmed{opacity:.32}
-.t-node.shocked{border-color:var(--rose);box-shadow:0 0 0 1px var(--rose)}
-.t-node.apex{grid-column:1 / -1;border-color:rgba(56,189,248,.42);background:linear-gradient(90deg,var(--panel) 0%,var(--panel-2) 100%)}
-.t-node.apex .t-node-name{min-height:auto}
-.t-node-top{display:flex;justify-content:space-between;align-items:center;font:700 10px/1 var(--mono);color:var(--mute)}
-.t-node-num{color:var(--amber)}
-.t-node-name{font:700 .88rem/1.2 var(--sans);min-height:2.2em}
-.t-node-sub{font:500 .73rem/1.2 var(--mono);color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* Animated Flow Ribbon SVG */
-.flow-ribbon{width:100%;height:30px;display:block;margin:4px 0 8px}
-.flow-path{stroke:var(--cyan);stroke-width:2;stroke-dasharray:6 6;fill:none;animation:flowDash 1.4s linear infinite}
-.flow-path.throttled{stroke:var(--rose);animation-duration:4.5s}
-@keyframes flowDash{to{stroke-dashoffset:-24}}
-
-/* Bars */
-.bar{display:block;height:7px;background:var(--track);border-radius:999px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;transition:width .42s cubic-bezier(.22,1,.36,1);border-radius:999px}
-.stack{display:flex;height:18px;border-radius:7px;overflow:hidden;margin:10px 0 6px;gap:2px;background:var(--track)}
-.stack i{display:block;height:100%;transition:width .42s ease}
-
-/* Detail Split */
-.split-2{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
-@media (max-width:920px){.split-2{grid-template-columns:1fr}}
-.eq-split{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;align-items:start}
-
-.choke-call{
-  border-left:3px solid var(--amber);background:var(--amber-bg);
-  padding:11px 14px;border-radius:0 10px 10px 0;margin:10px 0 14px;
-  font-size:.9rem;font-weight:600;color:var(--ink);
+.seg-btn:hover { color: var(--ink); }
+.seg-btn[aria-pressed="true"] {
+  background: var(--panel);
+  color: var(--amber);
+  box-shadow: var(--shadow-sm);
 }
 
-.player-list{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-.player-item{transition:opacity .18s}
-.player-item.dim{opacity:.25}
-.player-top{display:flex;align-items:baseline;gap:8px;margin-bottom:4px;flex-wrap:wrap}
-.player-btn{
-  background:none;border:0;padding:0;font:700 .94rem var(--sans);color:var(--ink);
-  text-decoration:underline;text-decoration-color:var(--amber);text-underline-offset:3px;cursor:pointer;
+/* Callout Frame (No thick left border slop) */
+.callout {
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--radius-md);
+  padding: 13px 16px;
+  margin: 12px 0 16px;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  color: var(--ink);
 }
-.player-btn:hover{color:var(--amber)}
-.player-share{margin-left:auto;font:700 1.05rem var(--mono)}
-.player-note{display:block;font-size:.81rem;color:var(--mute);margin-top:3px}
+.callout-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  margin-bottom: 4px;
+}
 
-/* Engineering Sidecar */
-.eng-box{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:16px}
-.eng-title{font:700 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin-bottom:8px}
-.eq-box{
-  background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;
-  font:600 .83rem/1.45 var(--mono);color:var(--amber);margin:8px 0 12px;overflow-x:auto;
+/* Topology Pipeline */
+.topo-shell {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 20px;
 }
-.spec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
-@media (max-width:520px){.spec-grid{grid-template-columns:1fr}}
-.spec-cell{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.spec-cell span{display:block;font:600 10px/1.2 var(--mono);text-transform:uppercase;color:var(--mute);margin-bottom:2px}
-.spec-cell b{font:700 .85rem/1.25 var(--mono);color:var(--ink)}
-.eng-list{margin:0;padding-left:18px;font-size:.83rem;color:var(--ink-2);display:grid;gap:6px}
-.src-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;padding-top:11px;border-top:1px dashed var(--line)}
-.src-link{
-  font:500 10.5px/1.2 var(--mono);padding:4px 8px;border-radius:6px;
-  background:var(--elev);border:1px solid var(--line);color:var(--cyan);
+.topo-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
 }
-.src-link:hover{border-color:var(--cyan);text-decoration:none}
+.topo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+@media (max-width: 980px) { .topo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .topo-grid { grid-template-columns: 1fr; } }
 
-/* Interactive Schematics SVG */
-.svg-stage{
-  background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px;overflow:hidden;
+.t-node {
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
-.svg-layer{cursor:pointer;transition:opacity .15s,filter .15s}
-.svg-layer:hover{filter:brightness(1.22)}
-.svg-layer.active-layer{stroke:var(--amber)!important;stroke-width:2.6!important;filter:drop-shadow(0 0 8px rgba(245,183,59,.45))}
-
-/* Controls & Metrics */
-.ctrl{margin-bottom:12px}
-.ctrl label{display:flex;justify-content:space-between;font-size:.81rem;font-weight:600;margin-bottom:4px;color:var(--ink-2)}
-.ctrl label b{font-family:var(--mono);color:var(--amber)}
-.ctrl input[type="range"]{width:100%;accent-color:var(--amber);cursor:pointer}
-.ctrl select{
-  width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line-2);
-  border-radius:8px;padding:8px 10px;font-size:.84rem;font-weight:600;
+.t-node:hover {
+  border-color: var(--cyan);
+  background: var(--panel-hover);
+  transform: translateY(-1px);
 }
-.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}
-.m-box{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px}
-.m-box span{display:block;font:600 10px/1.2 var(--mono);text-transform:uppercase;color:var(--mute)}
-.m-box strong{display:block;font:700 1.08rem/1.2 var(--mono);color:var(--ink);margin-top:2px}
-.m-box small{font-size:.72rem;color:var(--mute)}
-.chart-box{position:relative;height:220px;width:100%}
+.t-node[aria-current="true"] {
+  border-color: var(--amber);
+  background: var(--panel-hover);
+}
+.t-node.dimmed { opacity: 0.35; }
+.t-node.shocked { border-color: var(--rose); background: var(--rose-bg); }
+.t-node.apex {
+  grid-column: 1 / -1;
+  border-color: var(--cyan-border);
+  background: linear-gradient(90deg, var(--panel) 0%, var(--panel-2) 100%);
+}
+.t-node-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--mute);
+}
+.t-node-num { color: var(--amber); }
+.t-node-name {
+  font-size: 0.95rem;
+  line-height: 1.25;
+  font-weight: 700;
+  min-height: 2.3em;
+}
+.t-node.apex .t-node-name { min-height: auto; }
+.t-node-sub {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-/* Dual Wafer Comparison */
-.wafer-duo{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
-@media (max-width:560px){.wafer-duo{grid-template-columns:1fr}}
-.wafer-card{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
-.wafer-card h4{margin:0 0 6px;font:700 .86rem var(--mono);color:var(--cyan)}
+/* Progress & Stack Bars */
+.bar {
+  display: block;
+  height: 7px;
+  background: var(--elev);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+.bar i {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 999px;
+}
+.stack {
+  display: flex;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin: 12px 0 8px;
+  gap: 2px;
+  background: var(--elev);
+  border: 1px solid var(--border);
+}
+.stack i { display: block; height: 100%; transition: width 0.35s ease; }
+
+/* Flow Ribbon */
+.flow-ribbon { width: 100%; height: 26px; display: block; margin: 4px 0 10px; }
+.flow-path { stroke: var(--cyan); stroke-width: 2; stroke-dasharray: 6 6; fill: none; animation: flowDash 1.6s linear infinite; }
+.flow-path.throttled { stroke: var(--rose); animation-duration: 4.8s; }
+@keyframes flowDash { to { stroke-dashoffset: -24; } }
+
+/* Split Layouts */
+.split-2 {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 960px) { .split-2 { grid-template-columns: 1fr; } }
+.eq-split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/* Player List */
+.player-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.player-item { transition: opacity 0.18s; }
+.player-item.dim { opacity: 0.28; }
+.player-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; flex-wrap: wrap; }
+.player-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--amber);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.player-btn:hover { color: var(--amber); }
+.player-share { margin-left: auto; font-family: var(--mono); font-size: 1.1rem; font-weight: 700; }
+.player-note { display: block; font-size: 0.86rem; color: var(--ink-secondary); margin-top: 4px; line-height: 1.4; }
+
+/* Engineering Sidecar Box */
+.eng-box {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+.eng-title {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  margin-bottom: 10px;
+}
+.eq-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-family: var(--mono);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--amber);
+  margin: 10px 0 14px;
+  overflow-x: auto;
+}
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+@media (max-width: 540px) { .spec-grid { grid-template-columns: 1fr; } }
+.spec-cell {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+}
+.spec-cell span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-bottom: 3px;
+}
+.spec-cell b {
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--ink);
+}
+.eng-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ink-secondary);
+  display: grid;
+  gap: 8px;
+}
+.src-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+.src-link {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--cyan);
+  transition: border-color 0.14s;
+}
+.src-link:hover { border-color: var(--cyan); text-decoration: none; }
+
+/* Interactive Schematics Stage */
+.svg-stage {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  overflow: hidden;
+}
+.svg-layer {
+  cursor: pointer;
+  transition: opacity 0.15s, filter 0.15s;
+}
+.svg-layer:hover { filter: brightness(1.2); }
+.svg-layer.active-layer {
+  stroke: var(--amber) !important;
+  stroke-width: 2.4 !important;
+}
+
+/* Controls & Form Inputs */
+.ctrl { margin-bottom: 14px; }
+.ctrl label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--ink-secondary);
+}
+.ctrl label b { font-family: var(--mono); color: var(--amber); font-weight: 600; }
+.ctrl input[type="range"] {
+  width: 100%;
+  accent-color: var(--amber);
+  cursor: pointer;
+  height: 6px;
+  background: var(--elev);
+  border-radius: 4px;
+}
+.ctrl select {
+  width: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.m-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+}
+.m-box span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+.m-box strong {
+  display: block;
+  font-family: var(--mono);
+  font-size: 1.15rem;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ink);
+  margin-top: 3px;
+}
+.m-box small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--mute);
+  margin-top: 2px;
+}
+.chart-box { position: relative; height: 230px; width: 100%; }
+
+/* Dual Wafer Map */
+.wafer-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 14px 0; }
+@media (max-width: 580px) { .wafer-duo { grid-template-columns: 1fr; } }
+.wafer-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  text-align: center;
+}
+.wafer-card h4 {
+  margin: 0 0 8px;
+  font-family: var(--mono);
+  font-size: 0.9rem;
+  color: var(--cyan);
+}
 
 /* Stress Lab & Matrix */
-.preset-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
-.preset-btn{
-  background:var(--elev);border:1px solid var(--line-2);color:var(--ink);
-  border-radius:8px;padding:7px 11px;font-size:.79rem;font-weight:600;cursor:pointer;
+.preset-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.preset-btn {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 8px 13px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
-.preset-btn:hover,.preset-btn[aria-pressed="true"]{border-color:var(--rose);background:var(--rose-bg)}
-.ko-pill{
-  display:inline-flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--line);
-  border-radius:999px;padding:5px 10px;font-size:.78rem;color:var(--ink);cursor:pointer;margin:0 5px 6px 0;
+.preset-btn:hover, .preset-btn[aria-pressed="true"] {
+  border-color: var(--rose-border);
+  background: var(--rose-bg);
+  color: var(--rose);
 }
-.ko-pill[aria-pressed="true"]{background:var(--rose);border-color:var(--rose);color:#fff;font-weight:600}
-.stress-banner{
-  background:var(--bg);border:1px solid var(--line-2);border-left:4px solid var(--amber);
-  border-radius:10px;padding:14px;margin:12px 0;
+.ko-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  color: var(--ink);
+  cursor: pointer;
+  margin: 0 6px 8px 0;
+  transition: all 0.14s ease;
 }
-.stress-banner.severe{border-left-color:var(--rose)}
-.stress-row{display:grid;grid-template-columns:minmax(130px,195px) 1fr 54px;gap:10px;align-items:center;margin:7px 0}
-.stress-row small{display:block;color:var(--rose);font:500 .71rem var(--mono)}
-.stress-row b{text-align:right;font-family:var(--mono);font-size:.86rem}
+.ko-pill[aria-pressed="true"] {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: #ffffff;
+  font-weight: 600;
+}
+.stress-banner {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin: 14px 0;
+}
+.stress-banner.severe {
+  border-color: var(--rose-border);
+  background: var(--rose-bg);
+}
+.stress-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 205px) 1fr 60px;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0;
+}
+.stress-row small { display: block; color: var(--rose); font-family: var(--mono); font-size: 11.5px; }
+.stress-row b { text-align: right; font-family: var(--mono); font-size: 0.92rem; }
 
-.matrix-scroll{overflow-x:auto;padding-bottom:4px}
-.matrix-table{width:100%;border-collapse:separate;border-spacing:4px;min-width:760px}
-.matrix-table th{font:600 10.5px/1.2 var(--mono);color:var(--mute);text-align:left;padding:6px 7px;vertical-align:bottom}
-.matrix-table th.cty-th{width:130px;color:var(--ink)}
-.m-cell{
-  width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 4px;
-  font:700 11.5px/1 var(--mono);text-align:center;cursor:pointer;color:var(--ink);
-  transition:transform .12s,border-color .15s;
+.matrix-scroll { overflow-x: auto; padding-bottom: 6px; }
+.matrix-table { width: 100%; border-collapse: separate; border-spacing: 4px; min-width: 800px; }
+.matrix-table th { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--mute); text-align: left; padding: 6px 8px; vertical-align: bottom; }
+.matrix-table th.cty-th { width: 140px; color: var(--ink); font-size: 12px; }
+.m-cell {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  color: var(--ink);
+  transition: transform 0.12s, border-color 0.15s;
 }
-.m-cell:hover{transform:scale(1.05);border-color:var(--amber)}
-.m-cell.zero{color:var(--mute);opacity:.4;font-weight:400;background:var(--bg)}
+.m-cell:hover { transform: scale(1.04); border-color: var(--amber); }
+.m-cell.zero { color: var(--mute); opacity: 0.35; font-weight: 400; background: var(--bg); }
 
 /* Frontier Labs View */
-.lab-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;margin-top:12px}
-.lab-card{
-  background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:16px;
-  display:flex;flex-direction:column;gap:10px;transition:border-color .16s,transform .15s;
+.lab-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; margin-top: 14px; }
+.lab-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color 0.16s, transform 0.15s;
 }
-.lab-card:hover{border-color:var(--amber);transform:translateY(-2px)}
-.lab-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.lab-head h3{margin:0;font:800 1.08rem/1.15 var(--disp)}
-.lab-stack-tags{display:flex;flex-wrap:wrap;gap:5px}
-.lab-tag{font:600 10px/1.2 var(--mono);padding:3px 7px;border-radius:5px;background:var(--bg);border:1px solid var(--line-2);color:var(--ink-2)}
-.lab-tag.hi{border-color:rgba(245,183,59,.45);color:var(--amber);background:var(--amber-bg)}
-.lab-tag.cn{border-color:rgba(139,92,246,.45);color:var(--violet);background:rgba(139,92,246,.12)}
-.lab-kv{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.lab-kv div{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
-.lab-kv span{display:block;font:600 9.5px/1.2 var(--mono);text-transform:uppercase;color:var(--mute)}
-.lab-kv b{font:700 .8rem/1.25 var(--mono);color:var(--ink)}
-.lab-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto;padding-top:6px}
-.lab-actions button{font-size:.76rem;padding:6px 10px}
-.lab-table-wrap{overflow-x:auto;margin-top:16px}
-.lab-table{width:100%;border-collapse:collapse;min-width:760px;font-size:.82rem}
-.lab-table th,.lab-table td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line)}
-.lab-table th{font:600 10.5px var(--mono);text-transform:uppercase;color:var(--mute);background:var(--elev)}
-.lab-table tr:hover td{background:var(--panel-2)}
+.lab-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+.lab-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.lab-head h3 { margin: 0; font-size: 1.2rem; font-weight: 700; }
+.lab-stack-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.lab-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--ink-secondary);
+}
+.lab-tag.hi { border-color: var(--amber-border); color: var(--amber); background: var(--amber-bg); }
+.lab-tag.cn { border-color: var(--violet-border); color: var(--violet); background: var(--violet-bg); }
+.lab-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lab-kv div { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px 10px; }
+.lab-kv span { display: block; font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--mute); }
+.lab-kv b { font-family: var(--mono); font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+.lab-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 8px; }
+.lab-actions button { font-size: 0.82rem; padding: 7px 12px; }
+.lab-table-wrap { overflow-x: auto; margin-top: 20px; }
+.lab-table { width: 100%; border-collapse: collapse; min-width: 800px; font-size: 0.88rem; }
+.lab-table th, .lab-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+.lab-table th { font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; color: var(--mute); background: var(--elev); }
+.lab-table tr:hover td { background: var(--panel-2); }
 
-/* Dossiers */
-.dos-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
-.search-in{
-  flex:1 1 220px;background:var(--bg);color:var(--ink);border:1px solid var(--line-2);
-  border-radius:9px;padding:9px 12px;font-size:.87rem;
+/* Dossiers Directory */
+.dos-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+.search-in {
+  flex: 1 1 240px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.92rem;
 }
-.dos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:11px}
-.dos-card{
-  text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
-  padding:13px;cursor:pointer;color:inherit;display:flex;flex-direction:column;gap:5px;
-  transition:border-color .15s,transform .14s;
+.dos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.dos-card {
+  text-align: left;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.15s, transform 0.14s;
 }
-.dos-card:hover{border-color:var(--amber);transform:translateY(-2px)}
-.dos-card-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.dos-card b{font-size:.96rem}
-.dos-card code{font:600 10px var(--mono);color:var(--cyan)}
-.dos-card small{color:var(--mute);font-size:.77rem;line-height:1.38}
+.dos-card:hover { border-color: var(--amber); transform: translateY(-2px); }
+.dos-card-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.dos-card b { font-size: 1.02rem; }
+.dos-card code { font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+.dos-card small { color: var(--mute); font-size: 0.82rem; line-height: 1.4; }
 
 /* Buttons */
-.btn{
-  background:var(--ink);color:var(--bg);border:0;border-radius:9px;
-  padding:8px 15px;font-size:.84rem;font-weight:700;cursor:pointer;transition:opacity .15s;
+.btn {
+  background: var(--ink);
+  color: var(--bg);
+  border: 0;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
 }
-.btn:hover:not(:disabled){opacity:.88}
-.btn:disabled{opacity:.3;cursor:default}
-.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
-.btn-amber{background:var(--amber);color:#090d12}
-.step-nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn-outline { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--border-highlight); }
+.btn-amber { background: var(--amber); color: #080c14; }
+.step-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
 
-/* Modals (Dossier & Command-K) */
-.modal-bg{
-  position:fixed;inset:0;background:rgba(3,6,11,.76);backdrop-filter:blur(5px);
-  display:none;align-items:center;justify-content:center;padding:16px;z-index:60;
+/* Modals */
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 6, 12, 0.78);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 70;
 }
-.modal-bg.open{display:flex}
-.modal{
-  background:var(--panel);border:1px solid var(--line-2);border-radius:16px;
-  width:min(840px,100%);max-height:88vh;overflow-y:auto;padding:22px;box-shadow:0 24px 64px rgba(0,0,0,.6);
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: min(860px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: var(--shadow-lg);
 }
-.modal.cmd-modal{width:min(580px,100%);padding:16px}
-.modal-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
-.close-btn{
-  background:var(--elev);border:1px solid var(--line);color:var(--ink);
-  border-radius:8px;padding:6px 11px;font-weight:700;cursor:pointer;
+.modal.cmd-modal { width: min(600px, 100%); padding: 18px; }
+.modal-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 16px; }
+.close-btn {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
-.close-btn:hover{border-color:var(--amber)}
-.cmd-results{display:grid;gap:6px;margin-top:10px;max-height:52vh;overflow-y:auto}
-.cmd-item{
-  text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:9px;
-  padding:9px 12px;color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;
+.close-btn:hover { border-color: var(--amber); }
+.cmd-results { display: grid; gap: 6px; margin-top: 12px; max-height: 52vh; overflow-y: auto; }
+.cmd-item {
+  text-align: left;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
-.cmd-item:hover{border-color:var(--amber)}
-.cmd-item small{color:var(--mute);font-family:var(--mono);font-size:.72rem}
+.cmd-item:hover { border-color: var(--amber); }
+.cmd-item small { color: var(--mute); font-family: var(--mono); font-size: 11px; }
 
 /* Glossary Tooltips */
-abbr{text-decoration:underline dotted var(--amber);text-underline-offset:3px;cursor:help;font-weight:500}
-abbr:hover::after,abbr:focus::after{
-  content:attr(data-tip);position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
-  z-index:100;width:min(450px,90vw);background:var(--ink);color:var(--bg);
-  padding:10px 14px;border-radius:10px;font:500 .82rem/1.45 var(--sans);
-  box-shadow:0 12px 30px rgba(0,0,0,.48);text-align:left;pointer-events:none;
+abbr { text-decoration: underline dotted var(--amber); text-underline-offset: 3px; cursor: help; font-weight: 500; }
+abbr:hover::after, abbr:focus::after {
+  content: attr(data-tip);
+  position: fixed;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: min(460px, 92vw);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 11px 15px;
+  border-radius: var(--radius-md);
+  font: 500 0.86rem/1.5 var(--sans);
+  box-shadow: var(--shadow-lg);
+  text-align: left;
+  pointer-events: none;
 }
 
-footer{
-  margin-top:26px;padding-top:16px;border-top:1px solid var(--line);
-  font-size:.77rem;color:var(--mute);line-height:1.6;
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--panel);
+  border: 1px solid var(--emerald-border);
+  color: var(--emerald);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  z-index: 99;
+  display: none;
+  animation: toastIn 0.2s ease-out;
 }
-@media (prefers-reduced-motion:reduce){.bar i,.stack i,.view,.flow-path,.eyebrow .pulse{transition:none;animation:none}}
+.toast.show { display: block; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+footer {
+  margin-top: 32px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--mute);
+  line-height: 1.6;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar i, .stack i, .view, .flow-path { transition: none; animation: none; }
+}
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="cmd-header">
-    <div>
-      <div class="eyebrow"><span class="pulse"></span>SoTA Semiconductor Atlas · Verified Nov 2026</div>
+    <div class="cmd-title-block">
       <h1>Silicon to AI Factory</h1>
       <p class="lede">From 11-nines quartz sand and 13.5 nm tin-plasma EUV photons to CoWoS-L interposers, 2,048-bit HBM4 stacks, and $50B gigawatt AI factories. Built for first-principles engineering and geopolitical clarity.</p>
+      <div class="header-meta-row">
+        <span class="meta-tag highlight">Verified Q3/Q4 2026 Grounded</span>
+        <span class="meta-tag">11 Serial Stages</span>
+        <span class="meta-tag">6 Frontier Labs</span>
+        <span class="meta-tag">29 Executive Dossiers</span>
+      </div>
     </div>
     <div class="cmd-actions">
-      <button class="cmd-btn" id="openCmd" type="button">⌕ Quick Jump <kbd>/</kbd></button>
-      <button class="cmd-btn" id="themeToggle" type="button">☀ Light Mode</button>
+      <button class="cmd-btn" id="openCmd" type="button" aria-keyshortcuts="/" title="Quick search across stages, entities and physics">⌕ Quick Jump <kbd>/</kbd></button>
+      <button class="cmd-btn" id="copyShareBtn" type="button" title="Copy link to current view">⎘ Share View</button>
+      <button class="cmd-btn" id="themeToggle" type="button" title="Switch color theme">☀ Light Mode</button>
     </div>
   </header>
 
   <section class="telem-strip" aria-label="Live Supply Chain Telemetry">
-    <div class="telem crit">
-      <span>Absolute Monopoly</span>
+    <div class="telem" data-jump-tab="topology" data-jump-step="4">
+      <div class="telem-top">
+        <span class="telem-tag">Lithography</span>
+        <span class="telem-badge crit">Sole Source</span>
+      </div>
       <strong>100% EUV</strong>
-      <small>ASML (NL) + Carl Zeiss SMT (DE)</small>
+      <small>ASML (NL) + Carl Zeiss SMT (DE) · 0.33 &amp; 0.55 NA</small>
     </div>
-    <div class="telem warn">
-      <span>Foundry &amp; CoWoS-L</span>
+    <div class="telem" data-jump-tab="topology" data-jump-step="6">
+      <div class="telem-top">
+        <span class="telem-tag">Foundry &amp; CoWoS</span>
+        <span class="telem-badge warn">Geo-Choke</span>
+      </div>
       <strong>72.5% / ~85%</strong>
-      <small>TSMC Q3 rev $46.7B · N2 ramping</small>
+      <small>TSMC Q3 rev $46.7B (GM 66.4%) · N2 GAA ramping</small>
     </div>
-    <div class="telem">
-      <span>HBM4 Memory Wall</span>
+    <div class="telem" data-jump-tab="topology" data-jump-step="7">
+      <div class="telem-top">
+        <span class="telem-tag">Memory Wall</span>
+        <span class="telem-badge warn">Oligopoly</span>
+      </div>
       <strong>3.3 TB/s/stack</strong>
-      <small>2,048-bit bus · Korea 83% share</small>
+      <small>HBM4 2,048-bit bus · Korea 83% share</small>
     </div>
-    <div class="telem ok">
-      <span>Rack Unit Economics</span>
-      <strong>$3M / 120 kW</strong>
-      <small>GB200 NVL72 · 72 GPUs · 130 TB/s NVL</small>
+    <div class="telem" data-jump-tab="economics">
+      <div class="telem-top">
+        <span class="telem-tag">Rack Unit BOM</span>
+        <span class="telem-badge ok">Liquid Cooled</span>
+      </div>
+      <strong>$3M / 120–160 kW</strong>
+      <small>GB200 NVL72 · 72 GPUs · 130 TB/s NVLink</small>
     </div>
-    <div class="telem warn">
-      <span>1 GW AI Factory</span>
+    <div class="telem" data-jump-tab="economics">
+      <div class="telem-top">
+        <span class="telem-tag">1 GW AI Factory</span>
+        <span class="telem-badge warn">Power Choke</span>
+      </div>
       <strong>~$50B Capex</strong>
-      <small>~$40B/yr rev · $10B/qtr delay cost</small>
+      <small>~$40B/yr rev · $10B/qtr delay cost penalty</small>
     </div>
   </section>
 
   <nav class="nav-bar" role="tablist" aria-label="Primary Views">
-    <button class="nav-tab" role="tab" data-tab="topology" aria-selected="true">1. Live Topology</button>
-    <button class="nav-tab" role="tab" data-tab="schematics" aria-selected="false">2. CoWoS &amp; EUV Schematics</button>
-    <button class="nav-tab" role="tab" data-tab="economics" aria-selected="false">3. $50B AI Factory BOM</button>
-    <button class="nav-tab" role="tab" data-tab="physics" aria-selected="false">4. Chiplet Yield &amp; Optics</button>
-    <button class="nav-tab" role="tab" data-tab="warroom" aria-selected="false">5. War-Room &amp; Matrix</button>
-    <button class="nav-tab" role="tab" data-tab="labs" aria-selected="false">6. Frontier Labs (6)</button>
-    <button class="nav-tab" role="tab" data-tab="dossiers" aria-selected="false">7. Dossiers (29)</button>
+    <button class="nav-tab" role="tab" data-tab="topology" id="tab-topology" aria-controls="view-topology" aria-selected="true" tabindex="0">
+      <span>Supply Chain Topology</span>
+      <span class="nav-pill">11 Stages</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="schematics" id="tab-schematics" aria-controls="view-schematics" aria-selected="false" tabindex="-1">
+      <span>Packaging &amp; Optics Schematics</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="economics" id="tab-economics" aria-controls="view-economics" aria-selected="false" tabindex="-1">
+      <span>$50B AI Factory BOM</span>
+      <span class="nav-pill">Economics</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="physics" id="tab-physics" aria-controls="view-physics" aria-selected="false" tabindex="-1">
+      <span>Chiplet Yield &amp; Optics</span>
+      <span class="nav-pill">Physics</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="warroom" id="tab-warroom" aria-controls="view-warroom" aria-selected="false" tabindex="-1">
+      <span>War-Room Simulator</span>
+      <span class="nav-pill">Cascade</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="labs" id="tab-labs" aria-controls="view-labs" aria-selected="false" tabindex="-1">
+      <span>Frontier Labs</span>
+      <span class="nav-pill">6 Labs</span>
+    </button>
+    <button class="nav-tab" role="tab" data-tab="dossiers" id="tab-dossiers" aria-controls="view-dossiers" aria-selected="false" tabindex="-1">
+      <span>Executive Dossiers</span>
+      <span class="nav-pill">29 Entities</span>
+    </button>
   </nav>
 
-  <!-- VIEW 1: LIVE TOPOLOGY & CHAIN EXPLORER -->
-  <main id="view-topology" class="view active">
+  <!-- VIEW 1: TOPOLOGY & CHAIN EXPLORER -->
+  <main id="view-topology" class="view active" role="tabpanel" aria-labelledby="tab-topology">
     <div class="topo-shell">
       <div class="topo-header">
         <div>
-          <strong style="font:700 .88rem var(--mono);color:var(--cyan)">SERIAL DEPENDENCY TOPOLOGY (11 STAGES · SAND TO FRONTIER LABS)</strong>
-          <div class="sub" id="topoCap" style="margin:2px 0 0">Select any stage to inspect its physics &amp; market control, or filter by sovereign nation below.</div>
+          <strong style="font-family:var(--mono);font-size:0.92rem;color:var(--cyan)">SERIAL DEPENDENCY TOPOLOGY (11 STAGES · SAND TO FRONTIER LABS)</strong>
+          <div class="sub" id="topoCap" style="margin:4px 0 0">Select any stage to inspect its physics &amp; market control, or filter by sovereign nation below.</div>
         </div>
         <div id="legend" class="chips" style="margin:0" role="group" aria-label="Filter by country"></div>
       </div>
-      <svg class="flow-ribbon" viewBox="0 0 1200 30" preserveAspectRatio="none" aria-hidden="true">
-        <line x1="10" y1="15" x2="1190" y2="15" stroke="var(--line-2)" stroke-width="2"/>
-        <line id="flowPulse" class="flow-path" x1="10" y1="15" x2="1190" y2="15"/>
+      <svg class="flow-ribbon" viewBox="0 0 1200 26" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="10" y1="13" x2="1190" y2="13" stroke="var(--border)" stroke-width="2"/>
+        <line id="flowPulse" class="flow-path" x1="10" y1="13" x2="1190" y2="13"/>
       </svg>
-      <div id="topoGrid" class="topo-grid" role="group" aria-label="Ten supply chain stages"></div>
+      <div id="topoGrid" class="topo-grid" role="group" aria-label="Eleven supply chain stages"></div>
     </div>
     <section id="detailCard" class="card" aria-live="polite"></section>
   </main>
 
-  <!-- VIEW 2: INTERACTIVE ENGINEERING SCHEMATICS -->
-  <section id="view-schematics" class="view">
+  <!-- VIEW 2: SCHEMATICS -->
+  <section id="view-schematics" class="view" role="tabpanel" aria-labelledby="tab-schematics">
     <div class="card">
       <div class="card-head">
         <h2>Interactive 2.5D Package Cutaway: CoWoS-L + 12-Hi HBM4</h2>
-        <span class="badge cyan">Click any physical layer to inspect</span>
+        <span class="badge cyan">Select any physical layer to inspect</span>
       </div>
       <p class="sub">Modern AI accelerators exceed the 858 mm² lithography reticle wall by stitching dual compute dies and 8–12 HBM4 stacks via embedded Local Silicon Interconnect (LSI) bridges inside a reconstituted organic RDL interposer.</p>
       <div class="split-2">
@@ -506,76 +1208,76 @@ footer{
           <svg id="cowosSvg" viewBox="0 0 640 370" width="100%" role="img" aria-label="Interactive CoWoS-L and HBM4 cross-section">
             <!-- Liquid Cold Plate -->
             <g class="svg-layer active-layer" data-layer="coldplate">
-              <rect x="40" y="18" width="560" height="34" rx="6" fill="#0ea5e9" fill-opacity="0.22" stroke="#38bdf8" stroke-width="1.6"/>
-              <text x="320" y="39" text-anchor="middle" fill="#e0f2fe" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">DIRECT LIQUID COLD PLATE (1,200W–1,400W+ TDP · TIM Interface)</text>
+              <rect x="40" y="18" width="560" height="34" rx="6" fill="#0ea5e9" fill-opacity="0.22" stroke="#38bdf8" stroke-width="1.8"/>
+              <text x="320" y="39" text-anchor="middle" fill="#e0f2fe" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">DIRECT LIQUID COLD PLATE (1,200W–1,400W+ TDP · TIM Interface)</text>
             </g>
             <!-- HBM4 Left Stack -->
             <g class="svg-layer" data-layer="hbm4">
-              <rect x="52" y="64" width="104" height="84" rx="4" fill="#f97316" fill-opacity="0.24" stroke="#f97316" stroke-width="1.6"/>
+              <rect x="52" y="64" width="104" height="84" rx="4" fill="#f97316" fill-opacity="0.24" stroke="#f97316" stroke-width="1.8"/>
               <line x1="58" y1="78" x2="150" y2="78" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="58" y1="92" x2="150" y2="92" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="58" y1="106" x2="150" y2="106" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="58" y1="120" x2="150" y2="120" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="58" y1="134" x2="150" y2="134" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
-              <text x="104" y="102" text-anchor="middle" fill="#ffedd5" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="700">12-Hi HBM4</text>
-              <text x="104" y="117" text-anchor="middle" fill="#fed7aa" font-family="JetBrains Mono,monospace" font-size="9">TSVs · 2048-bit</text>
+              <text x="104" y="102" text-anchor="middle" fill="#ffedd5" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">12-Hi HBM4</text>
+              <text x="104" y="118" text-anchor="middle" fill="#fed7aa" font-family="JetBrains Mono,monospace" font-size="11.5">TSVs · 2048-bit</text>
             </g>
             <!-- HBM4 Right Stack -->
             <g class="svg-layer" data-layer="hbm4">
-              <rect x="484" y="64" width="104" height="84" rx="4" fill="#f97316" fill-opacity="0.24" stroke="#f97316" stroke-width="1.6"/>
+              <rect x="484" y="64" width="104" height="84" rx="4" fill="#f97316" fill-opacity="0.24" stroke="#f97316" stroke-width="1.8"/>
               <line x1="490" y1="78" x2="582" y2="78" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="490" y1="92" x2="582" y2="92" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="490" y1="106" x2="582" y2="106" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="490" y1="120" x2="582" y2="120" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
               <line x1="490" y1="134" x2="582" y2="134" stroke="#fdba74" stroke-width="1" stroke-dasharray="3 2"/>
-              <text x="536" y="102" text-anchor="middle" fill="#ffedd5" font-family="JetBrains Mono,monospace" font-size="10.5" font-weight="700">12-Hi HBM4</text>
-              <text x="536" y="117" text-anchor="middle" fill="#fed7aa" font-family="JetBrains Mono,monospace" font-size="9">Up to 3.3 TB/s</text>
+              <text x="536" y="102" text-anchor="middle" fill="#ffedd5" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">12-Hi HBM4</text>
+              <text x="536" y="118" text-anchor="middle" fill="#fed7aa" font-family="JetBrains Mono,monospace" font-size="11.5">Up to 3.3 TB/s</text>
             </g>
             <!-- HBM4 Logic Base Dies -->
             <g class="svg-layer" data-layer="basedie">
-              <rect x="52" y="150" width="104" height="22" rx="3" fill="#a78bfa" fill-opacity="0.32" stroke="#a78bfa" stroke-width="1.5"/>
-              <text x="104" y="164" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700">HBM4 BASE DIE</text>
-              <rect x="484" y="150" width="104" height="22" rx="3" fill="#a78bfa" fill-opacity="0.32" stroke="#a78bfa" stroke-width="1.5"/>
-              <text x="536" y="164" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700">HBM4 BASE DIE</text>
+              <rect x="52" y="150" width="104" height="22" rx="3" fill="#a78bfa" fill-opacity="0.32" stroke="#a78bfa" stroke-width="1.6"/>
+              <text x="104" y="165" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">HBM4 BASE DIE</text>
+              <rect x="484" y="150" width="104" height="22" rx="3" fill="#a78bfa" fill-opacity="0.32" stroke="#a78bfa" stroke-width="1.6"/>
+              <text x="536" y="165" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">HBM4 BASE DIE</text>
             </g>
             <!-- Dual Reticle GPU Logic Dies -->
             <g class="svg-layer" data-layer="gpudie">
-              <rect x="172" y="76" width="140" height="96" rx="5" fill="#10b981" fill-opacity="0.26" stroke="#10b981" stroke-width="1.8"/>
-              <text x="242" y="118" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700">GPU DIE 0</text>
-              <text x="242" y="134" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="9">TSMC N3/N2 · ~800mm²</text>
-              <rect x="328" y="76" width="140" height="96" rx="5" fill="#10b981" fill-opacity="0.26" stroke="#10b981" stroke-width="1.8"/>
-              <text x="398" y="118" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700">GPU DIE 1</text>
-              <text x="398" y="134" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="9">TSMC N3/N2 · ~800mm²</text>
+              <rect x="172" y="76" width="140" height="96" rx="5" fill="#10b981" fill-opacity="0.26" stroke="#10b981" stroke-width="2"/>
+              <text x="242" y="118" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">GPU DIE 0</text>
+              <text x="242" y="135" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="11.5">TSMC N3/N2 · ~800mm²</text>
+              <rect x="328" y="76" width="140" height="96" rx="5" fill="#10b981" fill-opacity="0.26" stroke="#10b981" stroke-width="2"/>
+              <text x="398" y="118" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">GPU DIE 1</text>
+              <text x="398" y="135" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="11.5">TSMC N3/N2 · ~800mm²</text>
             </g>
             <!-- Micro-bumps -->
             <g class="svg-layer" data-layer="ubumps">
-              <rect x="52" y="176" width="536" height="14" rx="2" fill="#eab308" fill-opacity="0.22" stroke="#eab308" stroke-width="1" stroke-dasharray="4 3"/>
-              <text x="320" y="186" text-anchor="middle" fill="#fef08a" font-family="JetBrains Mono,monospace" font-size="8.5" font-weight="700">MICRO-BUMPS / HYBRID BONDING INTERFACE (&lt;25 µm pitch)</text>
+              <rect x="52" y="176" width="536" height="15" rx="2" fill="#eab308" fill-opacity="0.22" stroke="#eab308" stroke-width="1.2" stroke-dasharray="4 3"/>
+              <text x="320" y="187" text-anchor="middle" fill="#fef08a" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">MICRO-BUMPS / HYBRID BONDING INTERFACE (&lt;25 µm pitch)</text>
             </g>
             <!-- Organic RDL Interposer + Embedded LSI Silicon Bridges -->
             <g class="svg-layer" data-layer="rdl">
-              <rect x="40" y="194" width="560" height="66" rx="6" fill="#3b82f6" fill-opacity="0.18" stroke="#3b82f6" stroke-width="1.6"/>
-              <text x="320" y="251" text-anchor="middle" fill="#bfdbfe" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700">CoWoS-L ORGANIC RDL INTERPOSER (3.3× to 4.0× Reticle · TIV Power Vias)</text>
+              <rect x="40" y="195" width="560" height="66" rx="6" fill="#3b82f6" fill-opacity="0.18" stroke="#3b82f6" stroke-width="1.8"/>
+              <text x="320" y="252" text-anchor="middle" fill="#bfdbfe" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">CoWoS-L ORGANIC RDL INTERPOSER (3.3× to 4.0× Reticle · TIV Power Vias)</text>
             </g>
             <g class="svg-layer" data-layer="lsi">
-              <rect x="130" y="202" width="70" height="28" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.7"/>
-              <text x="165" y="220" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700">LSI BRIDGE</text>
-              <rect x="280" y="202" width="80" height="28" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.7"/>
-              <text x="320" y="220" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700">10 TB/s LSI</text>
-              <rect x="440" y="202" width="70" height="28" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.7"/>
-              <text x="475" y="220" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700">LSI BRIDGE</text>
+              <rect x="130" y="202" width="70" height="30" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.8"/>
+              <text x="165" y="221" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">LSI BRIDGE</text>
+              <rect x="280" y="202" width="80" height="30" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.8"/>
+              <text x="320" y="221" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">10 TB/s LSI</text>
+              <rect x="440" y="202" width="70" height="30" rx="4" fill="#f5b73b" fill-opacity="0.34" stroke="#f5b73b" stroke-width="1.8"/>
+              <text x="475" y="221" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">LSI BRIDGE</text>
             </g>
             <!-- ABF Substrate -->
             <g class="svg-layer" data-layer="abf">
-              <rect x="26" y="274" width="588" height="44" rx="6" fill="#64748b" fill-opacity="0.28" stroke="#94a3b8" stroke-width="1.6"/>
-              <text x="320" y="300" text-anchor="middle" fill="#e2e8f0" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700">AJINOMOTO BUILD-UP FILM (ABF) SUBSTRATE · C4 Solder Balls → Server PCB</text>
+              <rect x="26" y="274" width="588" height="44" rx="6" fill="#64748b" fill-opacity="0.28" stroke="#94a3b8" stroke-width="1.8"/>
+              <text x="320" y="301" text-anchor="middle" fill="#e2e8f0" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700">AJINOMOTO BUILD-UP FILM (ABF) SUBSTRATE · C4 Solder Balls → Server PCB</text>
             </g>
             <!-- BGA Balls -->
             <g fill="#94a3b8" opacity="0.65">
-              <circle cx="60" cy="332" r="6"/><circle cx="100" cy="332" r="6"/><circle cx="140" cy="332" r="6"/><circle cx="180" cy="332" r="6"/>
-              <circle cx="220" cy="332" r="6"/><circle cx="260" cy="332" r="6"/><circle cx="300" cy="332" r="6"/><circle cx="340" cy="332" r="6"/>
-              <circle cx="380" cy="332" r="6"/><circle cx="420" cy="332" r="6"/><circle cx="460" cy="332" r="6"/><circle cx="500" cy="332" r="6"/>
-              <circle cx="540" cy="332" r="6"/><circle cx="580" cy="332" r="6"/>
+              <circle cx="60" cy="334" r="6"/><circle cx="100" cy="334" r="6"/><circle cx="140" cy="334" r="6"/><circle cx="180" cy="334" r="6"/>
+              <circle cx="220" cy="334" r="6"/><circle cx="260" cy="334" r="6"/><circle cx="300" cy="334" r="6"/><circle cx="340" cy="334" r="6"/>
+              <circle cx="380" cy="334" r="6"/><circle cx="420" cy="334" r="6"/><circle cx="460" cy="334" r="6"/><circle cx="500" cy="334" r="6"/>
+              <circle cx="540" cy="334" r="6"/><circle cx="580" cy="334" r="6"/>
             </g>
           </svg>
         </div>
@@ -591,43 +1293,42 @@ footer{
       <div class="split-2">
         <div class="svg-stage">
           <svg id="euvSvg" viewBox="0 0 640 250" width="100%" role="img" aria-label="Interactive EUV 13.5 nm optical train">
-            <!-- Beam lines -->
             <polyline points="85,125 185,125 275,65 375,180 475,65 565,175" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="7 5" class="flow-path"/>
             <!-- Tin Plasma -->
             <g class="svg-layer active-layer" data-euvstage="source">
               <circle cx="85" cy="125" r="34" fill="#f43f5e" fill-opacity="0.22" stroke="#f43f5e" stroke-width="2"/>
-              <text x="85" y="121" text-anchor="middle" fill="#ffe4e6" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700">Sn PLASMA</text>
-              <text x="85" y="135" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono,monospace" font-size="8.5">50 kHz · CO₂</text>
+              <text x="85" y="122" text-anchor="middle" fill="#ffe4e6" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">Sn PLASMA</text>
+              <text x="85" y="137" text-anchor="middle" fill="#fda4af" font-family="JetBrains Mono,monospace" font-size="11">50 kHz · CO₂</text>
             </g>
             <!-- Collector -->
             <g class="svg-layer" data-euvstage="collector">
               <rect x="150" y="92" width="72" height="66" rx="8" fill="#f5b73b" fill-opacity="0.2" stroke="#f5b73b" stroke-width="1.8"/>
-              <text x="186" y="122" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="700">COLLECTOR</text>
-              <text x="186" y="136" text-anchor="middle" fill="#fde68a" font-family="JetBrains Mono,monospace" font-size="8">13.5 nm</text>
+              <text x="186" y="122" text-anchor="middle" fill="#fef3c7" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">COLLECTOR</text>
+              <text x="186" y="137" text-anchor="middle" fill="#fde68a" font-family="JetBrains Mono,monospace" font-size="11">13.5 nm</text>
             </g>
             <!-- Bragg Mirrors -->
             <g class="svg-layer" data-euvstage="bragg">
-              <rect x="236" y="34" width="84" height="58" rx="8" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1.8"/>
-              <text x="278" y="60" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="700">Mo/Si BRAGG</text>
-              <text x="278" y="74" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="8">R ≈ 70%/bounce</text>
+              <rect x="236" y="34" width="84" height="60" rx="8" fill="#10b981" fill-opacity="0.22" stroke="#10b981" stroke-width="1.8"/>
+              <text x="278" y="61" text-anchor="middle" fill="#d1fae5" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">Mo/Si BRAGG</text>
+              <text x="278" y="76" text-anchor="middle" fill="#a7f3d0" font-family="JetBrains Mono,monospace" font-size="11">R ≈ 70%/bounce</text>
             </g>
             <!-- Reticle -->
             <g class="svg-layer" data-euvstage="reticle">
-              <rect x="334" y="152" width="84" height="56" rx="8" fill="#a78bfa" fill-opacity="0.24" stroke="#a78bfa" stroke-width="1.8"/>
-              <text x="376" y="177" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="700">RETICLE</text>
-              <text x="376" y="191" text-anchor="middle" fill="#ddd6fe" font-family="JetBrains Mono,monospace" font-size="8">Reflective Mask</text>
+              <rect x="334" y="152" width="84" height="58" rx="8" fill="#a78bfa" fill-opacity="0.24" stroke="#a78bfa" stroke-width="1.8"/>
+              <text x="376" y="177" text-anchor="middle" fill="#ede9fe" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">RETICLE</text>
+              <text x="376" y="192" text-anchor="middle" fill="#ddd6fe" font-family="JetBrains Mono,monospace" font-size="11">Reflective Mask</text>
             </g>
             <!-- High-NA Optics -->
             <g class="svg-layer" data-euvstage="highna">
-              <rect x="432" y="34" width="90" height="58" rx="8" fill="#38bdf8" fill-opacity="0.22" stroke="#38bdf8" stroke-width="1.8"/>
-              <text x="477" y="60" text-anchor="middle" fill="#e0f2fe" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="700">ZEISS 0.55 NA</text>
-              <text x="477" y="74" text-anchor="middle" fill="#bae6fd" font-family="JetBrains Mono,monospace" font-size="8">4×/8× Anamorphic</text>
+              <rect x="432" y="34" width="90" height="60" rx="8" fill="#38bdf8" fill-opacity="0.22" stroke="#38bdf8" stroke-width="1.8"/>
+              <text x="477" y="61" text-anchor="middle" fill="#e0f2fe" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">ZEISS 0.55 NA</text>
+              <text x="477" y="76" text-anchor="middle" fill="#bae6fd" font-family="JetBrains Mono,monospace" font-size="11">4×/8× Optics</text>
             </g>
             <!-- Wafer Stage -->
             <g class="svg-layer" data-euvstage="wafer">
               <rect x="524" y="148" width="96" height="58" rx="8" fill="#ec4899" fill-opacity="0.22" stroke="#ec4899" stroke-width="1.8"/>
-              <text x="572" y="174" text-anchor="middle" fill="#fce7f3" font-family="JetBrains Mono,monospace" font-size="9.5" font-weight="700">300mm WAFER</text>
-              <text x="572" y="188" text-anchor="middle" fill="#fbcfe8" font-family="JetBrains Mono,monospace" font-size="8">8 nm CD · Resist</text>
+              <text x="572" y="174" text-anchor="middle" fill="#fce7f3" font-family="JetBrains Mono,monospace" font-size="11.5" font-weight="700">300mm WAFER</text>
+              <text x="572" y="189" text-anchor="middle" fill="#fbcfe8" font-family="JetBrains Mono,monospace" font-size="11">8 nm CD · Resist</text>
             </g>
           </svg>
         </div>
@@ -637,11 +1338,11 @@ footer{
   </section>
 
   <!-- VIEW 3: $50B AI FACTORY & UNIT ECONOMICS -->
-  <section id="view-economics" class="view">
+  <section id="view-economics" class="view" role="tabpanel" aria-labelledby="tab-economics">
     <div class="card">
       <div class="card-head">
         <h2>Sand to $50B Gigawatt AI Factory: Value-Capture Waterfall</h2>
-        <span class="badge ok">Verified Oct–Nov 2026 Benchmarks</span>
+        <span class="badge ok">Verified Oct–Nov 2026 Grounding</span>
       </div>
       <p class="sub">Trace how a ~$180 blank 300 mm silicon wafer compounds into a $20K–$30K processed wafer, a $3.3K–$6.75K GPU BOM, a $40K GPU ASP, a $3M liquid-cooled NVL72 rack, and a $50B 1 GW AI factory.</p>
       <div class="split-2">
@@ -666,7 +1367,7 @@ footer{
           <div class="eq-box" id="econFormula"></div>
         </div>
         <div>
-          <h3 style="margin-bottom:6px">GPU BOM vs. System Value Capture ($/GPU)</h3>
+          <h3 style="margin-bottom:8px">GPU BOM vs. System Value Capture ($/GPU)</h3>
           <div class="chart-box" style="height:260px"><canvas id="econChart"></canvas></div>
           <div class="src-row">
             <a class="src-link" href="https://siliconanalysts.com/analysis/nvidia-b200-blackwell-cost-breakdown" target="_blank" rel="noopener noreferrer">↗ Silicon Analysts B200 Cost</a>
@@ -679,7 +1380,7 @@ footer{
   </section>
 
   <!-- VIEW 4: PHD PHYSICS & CHIPLET YIELD LAB -->
-  <section id="view-physics" class="view">
+  <section id="view-physics" class="view" role="tabpanel" aria-labelledby="tab-physics">
     <div class="card">
       <div class="card-head">
         <h2>Monolithic vs. Dual-Chiplet 300 mm Wafer Yield Comparator</h2>
@@ -768,7 +1469,7 @@ footer{
   </section>
 
   <!-- VIEW 5: GEOPOLITICAL WAR-ROOM & SOVEREIGN MATRIX -->
-  <section id="view-warroom" class="view">
+  <section id="view-warroom" class="view" role="tabpanel" aria-labelledby="tab-warroom">
     <div class="card" id="stressCard"></div>
     <div class="card">
       <div class="card-head">
@@ -781,14 +1482,14 @@ footer{
   </section>
 
   <!-- VIEW 6: FRONTIER MODEL LABS -->
-  <section id="view-labs" class="view">
+  <section id="view-labs" class="view" role="tabpanel" aria-labelledby="tab-labs">
     <div class="card">
       <div class="card-head">
         <h2>Frontier Model Labs &amp; Silicon Co-Design Matrix</h2>
         <span class="badge ok">Verified Nov 2026</span>
       </div>
       <p class="sub">How the six frontier AI labs translate upstream semiconductor bottlenecks (TSMC N3/N2, CoWoS-L, HBM4, SMIC N+3) into gigawatt compute strategies, custom ASIC hedges, and software moats beyond CUDA.</p>
-      <div class="dos-bar" style="margin-bottom:8px">
+      <div class="dos-bar" style="margin-bottom:10px">
         <div class="seg-toggle" style="margin:0" role="group" aria-label="Filter frontier labs">
           <button class="seg-btn" data-lfilter="all" aria-pressed="true">All Frontier Labs (6)</button>
           <button class="seg-btn" data-lfilter="us" aria-pressed="false">US Frontier (4)</button>
@@ -801,8 +1502,8 @@ footer{
     </div>
   </section>
 
-  <!-- VIEW 6: EXECUTIVE DOSSIERS -->
-  <section id="view-dossiers" class="view">
+  <!-- VIEW 7: EXECUTIVE DOSSIERS -->
+  <section id="view-dossiers" class="view" role="tabpanel" aria-labelledby="tab-dossiers">
     <div class="card">
       <div class="card-head">
         <h2>Executive Dossiers &amp; Verified 2026 Financials</h2>
@@ -834,8 +1535,8 @@ footer{
 <!-- COMMAND-K MODAL -->
 <div class="modal-bg" id="cmdModal" role="dialog" aria-modal="true" aria-label="Quick Jump">
   <div class="modal cmd-modal">
-    <div class="modal-head" style="margin-bottom:10px">
-      <strong style="font:700 .9rem var(--mono);color:var(--cyan)">QUICK JUMP · STEPS, DOSSIERS &amp; TERMS</strong>
+    <div class="modal-head" style="margin-bottom:12px">
+      <strong style="font-family:var(--mono);font-size:0.92rem;color:var(--cyan)">QUICK JUMP · STEPS, DOSSIERS &amp; TERMS</strong>
       <button class="close-btn" id="closeCmd" aria-label="Close">ESC</button>
     </div>
     <input type="search" id="cmdInput" class="search-in" style="width:100%" placeholder="Type a company, stage, or physics term (e.g. Zeiss, CoWoS, HBM4, TSMC)...">
@@ -843,16 +1544,19 @@ footer{
   </div>
 </div>
 
+<!-- TOAST -->
+<div id="toast" class="toast">View link copied to clipboard</div>
+
 <script>
 const C = {
-  US: ["United States", "#3b82f6"],
-  TW: ["Taiwan", "#10b981"],
-  KR: ["South Korea", "#f97316"],
-  JP: ["Japan", "#ec4899"],
-  NL: ["Netherlands", "#eab308"],
-  DE: ["Germany", "#22c55e"],
-  CN: ["China", "#8b5cf6"],
-  XX: ["Other / mixed", "#64748b"]
+  US: ["United States", "#38bdf8"],
+  TW: ["Taiwan", "#34d399"],
+  KR: ["South Korea", "#fb923c"],
+  JP: ["Japan", "#f472b6"],
+  NL: ["Netherlands", "#fbbf24"],
+  DE: ["Germany", "#4ade80"],
+  CN: ["China", "#a78bfa"],
+  XX: ["Other / mixed", "#94a3b8"]
 };
 
 const GL = {
@@ -1183,8 +1887,7 @@ const DOS = {
   Amazon: { dem:1, t:"NASDAQ: AMZN", cty:"US", role:"Hyperscaler #1 Capex", f:[["2026 Capex","~$220B","+$20B on HBM costs"],["Q3 26 Capex","$75.9B","AWS AI buildout"],["Custom Chip","Trainium","In-house ASIC"],["Partner","Anthropic","Multi-GW compute"]], bm:"AWS rents NVIDIA GPUs and Trainium ASICs funded by retail/ads.", lev:"Largest capex engine in AI; dual-sourcing NVIDIA & Trainium.", fc:"Sustaining ~$220B+ annual infrastructure buildout.", rk:"Near-term FCF compression & memory inflation.", src:[["J.P. Morgan AI Capex","https://www.jpmorgan.com/insights/global-research/artificial-intelligence/ai-capex"]] },
   Alphabet: { dem:1, t:"NASDAQ: GOOGL", cty:"US", role:"Hyperscaler & TPU Leader", f:[["2026 Capex","$180–205B","Rising into 2027"],["Cloud Growth","+63% YoY","Q1 2026"],["Backlog","$460B+","Cloud AI orders"],["Custom Chip","TPU Fleet","Mature at scale"]], bm:"Search & ads fund Google Cloud and Broadcom-co-designed TPUs.", lev:"Only hyperscaler running frontier models primarily on in-house silicon at scale.", fc:"CFO guides further capex step-up in 2027.", rk:"TPUs still rely 100% on TSMC & HBM.", src:[["NextMSC $725B Capex","https://www.nextmsc.com/news/hyperscaler-capex-surge-reshapes-ai-as-a-service"]] },
   Microsoft: { dem:1, t:"NASDAQ: MSFT", cty:"US", role:"Hyperscaler & Azure AI", f:[["2026 Capex","~$170–190B","Power/DC delays"],["AI Run Rate","$37B+","Azure AI & Copilot"],["OpenAI","250B commit","Through 2030"],["Constraint","Grid Power","Shell bottlenecks"]], bm:"Azure cloud, enterprise Copilot, and OpenAI cluster hosting.", lev:"Massive enterprise distribution & anchor frontier demand.", fc:"Grid power & third-party shell delays gated 2026 spend.", rk:"Power delays, OpenAI concentration & D&A.", src:[["J.P. Morgan AI Capex","https://www.jpmorgan.com/insights/global-research/artificial-intelligence/ai-capex"]] },
-  Meta: { dem:1, t:"NASDAQ: META", cty:"US", role:"Internal AI Mega-Buyer", f:[["2026 Capex","$125–145B","Raised $10B Apr '26"],["Q1 26 Rev","$56.3B","+33% YoY"],["Workloads","Ads & Llama","No cloud resale"],["Custom Chip","MTIA","Inference ASIC"]], bm:"Ad revenue funds GPU clusters for ranking, Reels, and Llama.", lev:"Top-tier NVIDIA/AMD buyer scaling internal MTIA inference chips.", fc:"Evaluating 2027 multi-GW buildouts under ROI scrutiny.", rk:"No external cloud resale stream.", src:[["NextMSC $725B Capex","https://www.nextmsc.com/news/hyperscaler-capex-surge-reshapes-ai-as-a-service"]] }
-,
+  Meta: { dem:1, t:"NASDAQ: META", cty:"US", role:"Internal AI Mega-Buyer", f:[["2026 Capex","$125–145B","Raised $10B Apr '26"],["Q1 26 Rev","$56.3B","+33% YoY"],["Workloads","Ads & Llama","No cloud resale"],["Custom Chip","MTIA","Inference ASIC"]], bm:"Ad revenue funds GPU clusters for ranking, Reels, and Llama.", lev:"Top-tier NVIDIA/AMD buyer scaling internal MTIA inference chips.", fc:"Evaluating 2027 multi-GW buildouts under ROI scrutiny.", rk:"No external cloud resale stream.", src:[["NextMSC $725B Capex","https://www.nextmsc.com/news/hyperscaler-capex-surge-reshapes-ai-as-a-service"]] },
   OpenAI: {
     dem:1, lab:1, t:"Private ($852B val · Mar 2026)", cty:"US", role:"Frontier Lab · 26 GW Compute Plan",
     f:[["Planned Chip Deals","26 GW","10 NVDA / 6 AMD / 10 Broadcom"],["Stargate Plan","$400B–$500B","7–10 GW w/ Oracle & SoftBank"],["Cloud Contracts","$610B+","Oracle $300B · Azure $250B · AWS/CRWV"],["Mar 2026 Raise","$122B","At $852B valuation"]],
@@ -1240,16 +1943,17 @@ const DOS = {
     src:[["Alibaba Q2 FY27 & T-Head Training (Nov 19, 2026)","https://explainx.ai/blog/alibaba-september-quarter-2026-ai-cloud-53-percent-qwen-labs-loss-10-5-billion-yuan-2026"],["Alibaba WAIC 2026 Qwen & SAIL","https://www.alibabacloud.com/blog/alibaba-cloud-unveils-agent-native-innovations-at-waic-2026_603377"]]
   }
 };
+DOS["Samsung Foundry"] = DOS.Samsung;
+DOS["Japanese resist makers"] = DOS["Shin-Etsu"];
+
 const LAB_PROFILES = [
   { name:"OpenAI", cty:"US", region:"us", asic:true, model:"GPT-5 / Frontier Agents", silicon:["NVIDIA Vera Rubin (10 GW)","AMD MI450 (6 GW)","Broadcom ASIC (10 GW)"], foundry:"TSMC N3/N2 + CoWoS-L", hbm:"SK hynix / Samsung / Micron HBM4", scale:"26 GW planned · $400–500B Stargate", software:"CUDA + ROCm + Custom ASIC stack", highlight:"Broadest multi-vendor chip hedge in history; $852B valuation (Mar 2026)." },
   { name:"Anthropic", cty:"US", region:"us", asic:true, model:"Claude Frontier Family", silicon:["AWS Trainium2 (1M+ chips)","Google TPU v7/8 (up to 1M)","NVIDIA GPUs (220K+ Colossus 1)"], foundry:"TSMC N3/N2 + CoWoS-L", hbm:"SK hynix / Samsung / Micron", scale:"~$518B multi-cloud plan · Multi-GW", software:"AWS Neuron + JAX/XLA + CUDA", highlight:"True tri-silicon portability across Trainium, TPU, and NVIDIA." },
   { name:"Google DeepMind", cty:"US", region:"us", asic:true, model:"Gemini / Veo / Imagen", silicon:["TPU v7 Ironwood (9,216/pod)","TPU 8tx & 8i Max (Nov '26)","NVIDIA Vera Rubin (GCP A5X)"], foundry:"TSMC N3/N2 + CoWoS-L (w/ Broadcom)", hbm:"1.77 PB HBM/superpod · 288 GB/chip", scale:"Hundreds of thousands of TPUs", software:"JAX / XLA / AlphaChip RL layout", highlight:"Only fully vertically integrated chip-to-model lab avoiding the NVIDIA tax." },
   { name:"SpaceXSI (xAI)", cty:"US", region:"us", asic:false, model:"Grok 4.7 (Sep 2026)", silicon:["NVIDIA GB300 (440K+ active)","NVIDIA GB200 & H100","Spectrum-X Ethernet"], foundry:"TSMC N4/N3 + CoWoS-L", hbm:"HBM3E / HBM4 via NVIDIA", scale:"Targeting 1M GPUs · 1.2 GW Memphis", software:"CUDA + Spectrum-X + Grok Bot", highlight:"Fastest physical build speed; leases Colossus capacity to Anthropic & Google." },
   { name:"DeepSeek", cty:"CN", region:"cn", asic:true, model:"DeepSeek-V4 (1.6T MoE)", silicon:["Huawei Ascend 950DT (160K plan)","Ascend 960DT co-design","Legacy/Restricted NVIDIA (train)"], foundry:"SMIC N+3 (7nm-class DUV)", hbm:"144 GB HiZQ 2.0 (4.0 TB/s)", scale:"~1 GW Ulanqab inference cluster ($2.56B)", software:"TileLang kernels + CANN (anti-CUDA)", highlight:"Co-designing Huawei chips + TileLang to break Western CUDA lock-in." },
-  { name:"Alibaba Qwen", cty:"CN", region:"cn", asic:true, model:"Qwen 3.8-Max (2.4T)", silicon:["T-Head Zhenwu (560K shipped)","Zhenwu V900 (Q1 2027)","Multi-vendor domestic inference"], foundry:"Domestic China foundries", hbm:"Domestic / constrained HBM", scale:"AI Cloud +53% YoY · RMB 67.7B qtr capex", software:"T-Head SAIL (Open Source)", highlight:"Already training next-gen Qwen on proprietary T-Head silicon (Nov 2026)." }
+  { name:"Alibaba Qwen", cty:"CN", region:"cn", asic:true, model:"Qwen 3.8-Max (2.4T)", silicon:["T-Head Zhenwu V900 (Q1 '27)","Zhenwu 560K deployed","Domestic SMIC / In-house"], foundry:"SMIC / Domestic Foundries", hbm:"Custom In-Package Memory", scale:"AI Cloud +53% YoY · Peak scarcity hedge", software:"T-Head SAIL + Open-Source Qwen Stack", highlight:"Next-gen Qwen trained natively on domestic T-Head silicon." }
 ];
-DOS["Samsung Foundry"] = DOS.Samsung;
-DOS["Japanese resist makers"] = DOS["Shin-Etsu"];
 
 const CRIT = {
   ASML:[0,"10+","Zero EUV rivals. Leading-edge logic and HBM4 scaling halt immediately."],
@@ -1299,6 +2003,13 @@ const sumC = (pl, c) => pl.filter(x => x[1] === c).reduce((a, x) => a + x[2], 0)
 const calcHHI = pl => Math.round(pl.reduce((a, x) => a + x[2] * x[2], 0));
 const animBars = (root = document) => requestAnimationFrame(() => root.querySelectorAll("i[data-w]").forEach(e => e.style.width = e.dataset.w + "%"));
 
+function showToast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
 function initTheme() {
   try { const s = localStorage.getItem("s2g_sota_theme"); if (s === "light" || s === "dark") state.theme = s; } catch (e) {}
   applyTheme();
@@ -1311,10 +2022,17 @@ function applyTheme() {
   if (state.tab === "physics") renderChipletLab();
 }
 
-function switchTab(tab) {
+function switchTab(tab, updateHash = true) {
   state.tab = tab;
-  $$(".nav-tab").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === tab ? "true" : "false"));
+  $$(".nav-tab").forEach(b => {
+    const isCur = b.dataset.tab === tab;
+    b.setAttribute("aria-selected", isCur ? "true" : "false");
+    b.tabIndex = isCur ? 0 : -1;
+  });
   $$(".view").forEach(v => v.classList.toggle("active", v.id === "view-" + tab));
+  if (updateHash) {
+    try { history.replaceState(null, "", "#" + tab); } catch (e) {}
+  }
   if (tab === "topology") { renderLegend(); renderTopo(); renderDetail(); }
   if (tab === "schematics") { renderCowosInspector(); renderEuvInspector(); }
   if (tab === "economics") { renderEconomics(); }
@@ -1322,13 +2040,14 @@ function switchTab(tab) {
   if (tab === "warroom") { renderStressLab(); renderMatrix(); }
   if (tab === "labs") { renderLabsView(); }
   if (tab === "dossiers") { renderDossierDir(); }
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // VIEW 1: TOPOLOGY
 function renderLegend() {
   $("#legend").innerHTML = Object.keys(C).filter(k => k !== "XX").map(k =>
     `<button class="chip" data-country="${k}" aria-pressed="${state.focus === k}"><s style="background:${C[k][1]}"></s>${C[k][0]}</button>`
-  ).join("") + (state.focus ? `<button class="chip" data-country="CLEAR">✕ Clear</button>` : "");
+  ).join("") + (state.focus ? `<button class="chip" data-country="CLEAR">✕ Clear Focus</button>` : "");
 }
 
 function renderTopo() {
@@ -1341,14 +2060,14 @@ function renderTopo() {
     const subTxt = state.focus ? `${C[state.focus][0]} ${Math.round(val * 10) / 10}%` : `${top[0]} ${top[2]}%`;
     return `
       <button class="t-node ${dimmed ? "dimmed" : ""} ${i === 10 ? "apex" : ""}" data-step="${i}" aria-current="${i === state.cur}">
-        <div class="t-node-top"><span class="t-node-num">${String(i + 1).padStart(2, "0")}</span><span>${st.dem ? "DEMAND" : "SUPPLY"}</span></div>
+        <div class="t-node-top"><span class="t-node-num">STAGE ${String(i + 1).padStart(2, "0")}</span><span>${st.dem ? "DEMAND" : "SUPPLY"}</span></div>
         <div class="t-node-name">${st.n}</div>
         <span class="bar"><i data-w="${Math.min(100, val)}" style="background:${col}"></i></span>
         <div class="t-node-sub">${subTxt}</div>
       </button>`;
   }).join("");
   $("#topoCap").textContent = state.focus
-    ? `Highlighting ${C[state.focus][0]}'s footprint across all 10 serial stages. Click any stage to inspect.`
+    ? `Highlighting ${C[state.focus][0]}'s footprint across all serial stages. Click any stage to inspect.`
     : "Select any stage to inspect its physics, market control & verified sources. Use ← / → arrow keys to step through.";
   animBars($("#topoGrid"));
 }
@@ -1374,13 +2093,16 @@ function renderDetail() {
       <div class="meta-row" style="margin:0">
         <span class="badge cyan">${st.phase}</span>
         <span class="badge crit">${st.chokeLvl}</span>
-        <span class="badge ${st.v ? "ok" : ""}">${st.v ? "✓ Verified 2026" : "≈ Analyst Est."}</span>
+        <span class="badge ${st.v ? "ok" : ""}">${st.v ? "Verified 2026 Grounding" : "Analyst Estimate"}</span>
       </div>
     </div>
     <div class="split-2">
       <div>
         <p style="margin-top:0">${T(st.d)}</p>
-        <div class="choke-call">${T(st.ch)}</div>
+        <div class="callout">
+          <div class="callout-header">Chokepoint &amp; Strategic Lock-In</div>
+          <div>${T(st.ch)}</div>
+        </div>
         ${subHtml}
         <div class="meta-row">
           <span class="badge">HHI ${hhi} (${hhiLbl})</span>
@@ -1395,8 +2117,8 @@ function renderDetail() {
             const dim = state.focus && x[1] !== state.focus;
             return `<li class="player-item ${dim ? "dim" : ""}">
               <div class="player-top">
-                ${hasD ? `<button class="player-btn" data-dossier="${x[0]}">${x[0]}</button>` : `<strong style="font-size:.94rem">${x[0]}</strong>`}
-                <span style="font:500 .75rem var(--mono);color:var(--mute)">${C[x[1]][0]}</span>
+                ${hasD ? `<button class="player-btn" data-dossier="${x[0]}">${x[0]}</button>` : `<strong>${x[0]}</strong>`}
+                <span style="font-family:var(--mono);font-size:11.5px;color:var(--mute)">${C[x[1]][0]}</span>
                 <span class="player-share">${x[2]}%</span>
               </div>
               <span class="bar"><i data-w="${x[2]}" style="background:${C[x[1]][1]}"></i></span>
@@ -1415,7 +2137,7 @@ function renderDetail() {
     </div>
     <div class="step-nav">
       <button class="btn btn-outline" id="prevStep" ${state.cur === 0 ? "disabled" : ""}>← Previous Stage</button>
-      <span class="sub" style="margin:0">Stage ${state.cur + 1} of ${S.length}</span>
+      <span class="sub" style="margin:0">Stage ${state.cur + 1} of ${S.length} (Use Arrow Keys)</span>
       <button class="btn" id="nextStep" ${state.cur === S.length - 1 ? "disabled" : ""}>Next Stage →</button>
     </div>
   `;
@@ -1430,7 +2152,7 @@ function renderCowosInspector() {
     <div class="eng-title">Selected Package Layer</div>
     <h3 style="margin:0 0 10px">${d.title}</h3>
     <div class="spec-grid">${d.specs.map(([k, v]) => `<div class="spec-cell"><span>${k}</span><b>${v}</b></div>`).join("")}</div>
-    <p style="margin:0;font-size:.86rem;color:var(--ink-2)">${T(d.desc)}</p>
+    <p style="margin:0;font-size:0.9rem;color:var(--ink-secondary);line-height:1.5">${T(d.desc)}</p>
   `;
 }
 
@@ -1441,11 +2163,11 @@ function renderEuvInspector() {
     <div class="eng-title">Selected EUV Optical Stage</div>
     <h3 style="margin:0 0 10px">${d.title}</h3>
     <div class="spec-grid">${d.specs.map(([k, v]) => `<div class="spec-cell"><span>${k}</span><b>${v}</b></div>`).join("")}</div>
-    <p style="margin:0;font-size:.86rem;color:var(--ink-2)">${T(d.desc)}</p>
+    <p style="margin:0;font-size:0.9rem;color:var(--ink-secondary);line-height:1.5">${T(d.desc)}</p>
   `;
 }
 
-// VIEW 3: UNIT ECONOMICS & 1 GW AI FACTORY
+// VIEW 3: UNIT ECONOMICS
 const ECON = {
   h100: { name:"Hopper H100 SXM5", bom:[300, 1350, 750, 920], asp:30000, rackKw:10, gpusPerRack:8, factoryCapexGw:42, revGw:34, note:"H100 BOM ~$3,320 ($300 logic, $1,350 HBM3, $750 CoWoS-S, $920 test/pkg) vs ~$27K–$32K ASP (~88% gross margin)." },
   b200: { name:"Blackwell GB200 NVL72", bom:[950, 2900, 1650, 1250], asp:40000, rackKw:130, gpusPerRack:72, factoryCapexGw:50, revGw:40, note:"B200 BOM ~$6,750 vs ~$40K ASP; GB200 NVL72 packs 72 GPUs + 36 Grace CPUs at ~$3M/rack and 120–160 kW liquid-cooled." },
@@ -1466,7 +2188,6 @@ function renderEconomics() {
   const totalCapexB = (gw * e.factoryCapexGw).toFixed(1);
   const annualRevB = (gw * e.revGw).toFixed(1);
   const delayCostB = (gw * e.revGw * (delayMo / 12)).toFixed(1);
-  // Effective IT power ~80% of facility GW (PUE ~1.25)
   const racks = Math.round((gw * 1e6 * 0.80) / e.rackKw);
   const gpus = racks * e.gpusPerRack;
 
@@ -1480,8 +2201,8 @@ function renderEconomics() {
 
   if (typeof Chart !== "undefined") {
     const isLight = state.theme === "light";
-    const textCol = isLight ? "#5a6d80" : "#8ea2b5";
-    const gridCol = isLight ? "rgba(13,26,38,.09)" : "rgba(255,255,255,.08)";
+    const textCol = isLight ? "#475569" : "#cbd5e1";
+    const gridCol = isLight ? "rgba(15,23,42,.08)" : "rgba(255,255,255,.08)";
     if (econChartInst) econChartInst.destroy();
     econChartInst = new Chart($("#econChart"), {
       type: "bar",
@@ -1490,7 +2211,7 @@ function renderEconomics() {
         datasets: [{
           label: "$ per GPU",
           data: [...e.bom, e.asp - bomTot],
-          backgroundColor: ["#10b981", "#f97316", "#38bdf8", "#a78bfa", "#f5b73b"],
+          backgroundColor: ["#34d399", "#fb923c", "#38bdf8", "#c084fc", "#fbbf24"],
           borderRadius: 6
         }]
       },
@@ -1498,15 +2219,15 @@ function renderEconomics() {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: { ticks: { color: textCol, font: { size: 10.5 } }, grid: { display: false } },
-          y: { ticks: { color: textCol, font: { size: 10.5 }, callback: v => "$" + (v >= 1000 ? (v / 1000) + "K" : v) }, grid: { color: gridCol } }
+          x: { ticks: { color: textCol, font: { size: 11, family: "IBM Plex Sans" } }, grid: { display: false } },
+          y: { ticks: { color: textCol, font: { size: 11, family: "JetBrains Mono" }, callback: v => "$" + (v >= 1000 ? (v / 1000) + "K" : v) }, grid: { color: gridCol } }
         }
       }
     });
   }
 }
 
-// VIEW 4: PHYSICS & CHIPLET YIELD LAB
+// VIEW 4: PHYSICS & YIELD
 const NODES = { N5:{l:"N5 ($18.5K/wfr)",p:18500}, N3:{l:"N3 ($20K/wfr)",p:20000}, N2:{l:"N2 ($30K/wfr)",p:30000}, A16:{l:"A16 ($45K/wfr)",p:45000} };
 const calcGDPW = a => Math.max(1, Math.floor((Math.PI * 147 * 147) / a - (Math.PI * 294) / Math.sqrt(2 * a)));
 const calcMurphy = (d0, a) => { const x = d0 * (a / 100); return x <= 1e-4 ? 1 : Math.pow((1 - Math.exp(-x)) / x, 2); };
@@ -1526,8 +2247,8 @@ function miniWaferSvg(areaMm2, yFrac, title) {
   const bad = Math.round(cells.length * (1 - yFrac));
   const badSet = new Set();
   for (let i = 0; i < bad; i++) badSet.add(Math.floor(((i + 0.5) * 2654435761) % Math.max(1, cells.length)));
-  const rects = cells.map(([x,y,idx]) => `<rect x="${(x+.5).toFixed(1)}" y="${(y+.5).toFixed(1)}" width="${Math.max(2,diePx-1).toFixed(1)}" height="${Math.max(2,diePx-1).toFixed(1)}" rx="1" fill="${badSet.has(idx)?"#f43f5e":"#10b981"}" opacity=".85"/>`).join("");
-  return `<div class="wafer-card"><h4>${title}</h4><svg viewBox="0 0 156 156" width="144" height="144"><circle cx="78" cy="78" r="74" fill="var(--elev)" stroke="var(--line-2)" stroke-width="1.8"/>${rects}</svg><div class="sub" style="margin:4px 0 0">${cells.length} dies · <strong>${(yFrac*100).toFixed(1)}%</strong> good</div></div>`;
+  const rects = cells.map(([x,y,idx]) => `<rect x="${(x+.5).toFixed(1)}" y="${(y+.5).toFixed(1)}" width="${Math.max(2,diePx-1).toFixed(1)}" height="${Math.max(2,diePx-1).toFixed(1)}" rx="1" fill="${badSet.has(idx)?"#fb7185":"#34d399"}" opacity=".88"/>`).join("");
+  return `<div class="wafer-card"><h4>${title}</h4><svg viewBox="0 0 156 156" width="144" height="144"><circle cx="78" cy="78" r="74" fill="var(--elev)" stroke="var(--border)" stroke-width="2"/>${rects}</svg><div class="sub" style="margin:6px 0 0">${cells.length} dies · <strong>${(yFrac*100).toFixed(1)}%</strong> good</div></div>`;
 }
 
 function renderChipletLab() {
@@ -1542,7 +2263,6 @@ function renderChipletLab() {
   const monoY = calcMurphy(d0, area);
   const monoCost = node.p / Math.max(1, monoGdpw * monoY);
 
-  // Dual chiplet: 2 dies of (area/2 * 1.08 overhead for PHY/NV-HBI)
   const chipArea = (area / 2) * 1.08;
   const chipGdpw = calcGDPW(chipArea);
   const chipY = calcMurphy(d0, chipArea);
@@ -1560,21 +2280,21 @@ function renderChipletLab() {
   if (typeof Chart !== "undefined") {
     const areas = [150, 250, 350, 450, 550, 650, 750, 858];
     const isLight = state.theme === "light";
-    const textCol = isLight ? "#5a6d80" : "#8ea2b5";
-    const gridCol = isLight ? "rgba(13,26,38,.09)" : "rgba(255,255,255,.08)";
+    const textCol = isLight ? "#475569" : "#cbd5e1";
+    const gridCol = isLight ? "rgba(15,23,42,.08)" : "rgba(255,255,255,.08)";
     if (yieldChartInst) yieldChartInst.destroy();
     yieldChartInst = new Chart($("#yieldChart"), {
       type: "line",
       data: {
         labels: areas.map(a => a + "mm²"),
-        datasets: [{ label: `Murphy Yield at D₀=${d0.toFixed(2)}`, data: areas.map(a => +(calcMurphy(d0, a) * 100).toFixed(1)), borderColor: "#f5b73b", backgroundColor: "rgba(245,183,59,.14)", fill: true, tension: 0.3 }]
+        datasets: [{ label: `Murphy Yield at D₀=${d0.toFixed(2)}`, data: areas.map(a => +(calcMurphy(d0, a) * 100).toFixed(1)), borderColor: "#fbbf24", backgroundColor: "rgba(251,191,36,.14)", fill: true, tension: 0.3 }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: textCol, font: { size: 10.5 } } } },
+        plugins: { legend: { labels: { color: textCol, font: { size: 11, family: "IBM Plex Sans" } } } },
         scales: {
-          x: { ticks: { color: textCol, font: { size: 10 } }, grid: { color: gridCol } },
-          y: { min: 0, max: 100, ticks: { color: textCol, font: { size: 10 }, callback: v => v + "%" }, grid: { color: gridCol } }
+          x: { ticks: { color: textCol, font: { size: 11, family: "JetBrains Mono" } }, grid: { color: gridCol } },
+          y: { min: 0, max: 100, ticks: { color: textCol, font: { size: 11, family: "JetBrains Mono" }, callback: v => v + "%" }, grid: { color: gridCol } }
         }
       }
     });
@@ -1665,19 +2385,19 @@ function renderStressLab() {
     <p class="sub">Trigger a sovereign blockade or toggle individual monopolies. Because every AI GPU requires all 9 supply stages in series, the weakest stage caps global compute output.</p>
     <div class="preset-row">
       ${PRESETS.map(p => `<button class="preset-btn" data-preset="${p.id}" aria-pressed="${state.preset === p.id}">${p.label}</button>`).join("")}
-      ${on ? `<button class="preset-btn" id="resetStress" style="border-color:var(--amber)">↺ Reset</button>` : ""}
+      ${on ? `<button class="preset-btn" id="resetStress" style="border-color:var(--amber);color:var(--amber)">↺ Reset Baseline</button>` : ""}
     </div>
-    <div style="margin-bottom:10px">${top.map(([n, l]) => `<button class="ko-pill" data-ko="${n}" aria-pressed="${state.ko.has(n)}">${n} · −${Math.round(l)}%</button>`).join("")}</div>
-    <div class="ctrl" style="max-width:400px">
+    <div style="margin-bottom:12px">${top.map(([n, l]) => `<button class="ko-pill" data-ko="${n}" aria-pressed="${state.ko.has(n)}">${n} · −${Math.round(l)}%</button>`).join("")}</div>
+    <div class="ctrl" style="max-width:420px">
       <label for="sevSlider">Outage / Embargo Severity <b>${state.sev}%</b></label>
       <input type="range" id="sevSlider" min="10" max="100" step="10" value="${state.sev}">
     </div>
     <div class="stress-banner ${min.rem < 50 ? "severe" : ""}">
-      <div style="font:800 1.2rem/1.2 var(--disp);margin-bottom:5px">${on ? `Global AI GPU output capped at <span style="color:${bCol(min.rem)}">${min.rem.toFixed(0)}%</span> — bottlenecked by ${min.n}.` : "Baseline: 100% nominal throughput across all 9 supply stages."}</div>
-      <div style="font-size:.84rem;color:var(--ink-2)">${on ? `Recovery horizon: <strong>~${yrs}${yrs >= 10 ? "+" : ""} years</strong> · Est. <strong>$${lostB}B/yr</strong> stalled accelerator delivery.` : "Select a scenario preset or player pill above to simulate a disruption."}</div>
+      <div style="font-size:1.2rem;font-weight:700;line-height:1.25;margin-bottom:6px">${on ? `Global AI GPU output capped at <span style="color:${bCol(min.rem)}">${min.rem.toFixed(0)}%</span> — bottlenecked by ${min.n}.` : "Baseline: 100% nominal throughput across all 9 manufacturing stages."}</div>
+      <div style="font-size:0.9rem;color:var(--ink-secondary);line-height:1.5">${on ? `Recovery horizon: <strong>~${yrs}${yrs >= 10 ? "+" : ""} years</strong> · Est. <strong>$${lostB}B/yr</strong> stalled accelerator delivery.` : "Select a scenario preset or player pill above to simulate a disruption."}</div>
     </div>
-    <div>${sim.map(r => `<div class="stress-row"><span><strong>${r.n}</strong>${r.hits.length ? `<small>${r.hits.join(", ")} offline</small>` : ""}</span><span class="bar" style="height:10px"><i data-w="${r.rem}" style="background:${bCol(r.rem)}"></i></span><b style="color:${bCol(r.rem)}">${r.rem.toFixed(0)}%</b></div>`).join("")}</div>
-    ${on ? `<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--line);display:grid;gap:6px">${[...state.ko].slice(0, 6).map(n => `<div style="font-size:.82rem"><strong>${n}:</strong> ${CRIT[n] ? CRIT[n][2] : "Partial substitution over 1–2 years."}</div>`).join("")}</div>` : ""}
+    <div>${sim.map(r => `<div class="stress-row"><span><strong>${r.n}</strong>${r.hits.length ? `<small>${r.hits.join(", ")} offline</small>` : ""}</span><span class="bar" style="height:9px"><i data-w="${r.rem}" style="background:${bCol(r.rem)}"></i></span><b style="color:${bCol(r.rem)}">${r.rem.toFixed(0)}%</b></div>`).join("")}</div>
+    ${on ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);display:grid;gap:8px">${[...state.ko].slice(0, 6).map(n => `<div style="font-size:0.86rem;line-height:1.4"><strong>${n}:</strong> ${CRIT[n] ? CRIT[n][2] : "Partial substitution over 1–2 years."}</div>`).join("")}</div>` : ""}
   `;
   animBars($("#stressCard"));
 }
@@ -1693,7 +2413,7 @@ function renderMatrix() {
       const bg = v > 0 ? `${C[cty][1]}${Math.round(Math.min(0.86, 0.16 + v / 100 * 0.7) * 255).toString(16).padStart(2, "0")}` : "";
       return `<td><button class="m-cell ${v === 0 ? "zero" : ""}" data-mstep="${i}" data-mcty="${cty}" style="${v > 0 ? `background:${bg}` : ""}" title="${C[cty][0]} in ${st.n}: ${r}%">${v > 0 ? r + "%" : "—"}</button></td>`;
     }).join("");
-    return `<tr><th class="cty-th"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${C[cty][1]};margin-right:6px"></span>${C[cty][0]}</th>${cells}</tr>`;
+    return `<tr><th class="cty-th"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${C[cty][1]};margin-right:8px"></span>${C[cty][0]}</th>${cells}</tr>`;
   }).join("");
   $("#matrixWrap").innerHTML = `<table class="matrix-table"><thead><tr><th class="cty-th">Nation</th>${head}</tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -1712,7 +2432,7 @@ function renderLabsView() {
       <div class="lab-head">
         <div>
           <h3>${l.name}</h3>
-          <div style="font:600 .75rem var(--mono);color:var(--cyan);margin-top:2px">${l.model}</div>
+          <div style="font-family:var(--mono);font-size:12px;font-weight:600;color:var(--cyan);margin-top:2px">${l.model}</div>
         </div>
         <span class="badge ${l.region === "cn" ? "amber" : "ok"}">${C[l.cty][0]}</span>
       </div>
@@ -1725,7 +2445,7 @@ function renderLabsView() {
         <div><span>Compute Scale</span><b>${l.scale}</b></div>
         <div><span>Software Stack</span><b>${l.software}</b></div>
       </div>
-      <p style="margin:0;font-size:.81rem;color:var(--ink-2)">${T(l.highlight)}</p>
+      <p style="margin:0;font-size:0.86rem;color:var(--ink-secondary);line-height:1.45">${T(l.highlight)}</p>
       <div class="lab-actions">
         <button class="btn btn-outline" data-dossier="${l.name}">Open Full Dossier</button>
         <button class="btn btn-amber" data-trace-cty="${l.cty}">Trace ${C[l.cty][0]} in Topology →</button>
@@ -1734,13 +2454,13 @@ function renderLabsView() {
   `).join("");
 
   $("#labTableWrap").innerHTML = `
-    <h3 style="margin:10px 0 8px">Side-by-Side Silicon &amp; Bottleneck Comparison</h3>
+    <h3 style="margin:16px 0 10px">Side-by-Side Silicon &amp; Bottleneck Comparison</h3>
     <table class="lab-table">
       <thead><tr><th>Frontier Lab</th><th>Flagship (Late 2026)</th><th>Primary Silicon</th><th>Upstream Foundry</th><th>Software Moat</th></tr></thead>
       <tbody>
         ${list.map(l => `<tr>
           <td><button class="player-btn" data-dossier="${l.name}">${l.name}</button></td>
-          <td><code>${l.model}</code></td>
+          <td><code style="font-size:12px">${l.model}</code></td>
           <td>${l.silicon[0]}</td>
           <td>${l.foundry}</td>
           <td>${l.software}</td>
@@ -1749,7 +2469,7 @@ function renderLabsView() {
     </table>`;
 }
 
-// VIEW 6: DOSSIERS
+// VIEW 7: DOSSIERS
 function renderDossierDir() {
   const q = state.dosSearch.trim().toLowerCase();
   const list = Object.entries(DOS).filter(([n, d]) => {
@@ -1763,7 +2483,7 @@ function renderDossierDir() {
   $("#dossierGrid").innerHTML = list.length ? list.map(([n, d]) => `
     <button class="dos-card" data-dossier="${n}">
       <div class="dos-card-top"><b>${n}</b><code>${C[d.cty][0]}</code></div>
-      <div style="font:600 .74rem var(--mono);color:var(--amber)">${d.role}</div>
+      <div style="font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--amber)">${d.role}</div>
       <small>${d.f[0][0]}: <strong>${d.f[0][1]}</strong> · ${d.f[0][2]}</small>
     </button>`).join("") : `<p class="sub">No dossiers match "${state.dosSearch}".</p>`;
 }
@@ -1774,30 +2494,30 @@ function openDossier(name) {
   $("#dosModalBody").innerHTML = `
     <div class="modal-head">
       <div>
-        <h2 id="dosModalTitle" style="margin:0 0 6px">${name}</h2>
+        <h2 id="dosModalTitle" style="margin:0 0 8px">${name}</h2>
         <div class="meta-row" style="margin:0"><span class="badge ok">${d.t}</span><span class="badge cyan">${d.role}</span><span class="badge">${C[d.cty][0]}</span></div>
       </div>
       <button class="close-btn" id="closeDos">✕ Close</button>
     </div>
     <div class="metric-grid">${d.f.map(([k, v, s]) => `<div class="m-box"><span>${k}</span><strong>${v}</strong><small>${s}</small></div>`).join("")}</div>
-    ${d.h ? `<p class="sub" style="margin-bottom:5px">${d.h.u}</p><div class="chart-box" style="height:170px;margin-bottom:12px"><canvas id="dosChart"></canvas></div>` : ""}
-    <div style="display:grid;gap:9px;font-size:.89rem">
+    ${d.h ? `<p class="sub" style="margin-bottom:6px">${d.h.u}</p><div class="chart-box" style="height:175px;margin-bottom:14px"><canvas id="dosChart"></canvas></div>` : ""}
+    <div style="display:grid;gap:11px;font-size:0.92rem;line-height:1.55">
       <p style="margin:0"><strong>Business Model:</strong> ${T(d.bm)}</p>
       <p style="margin:0"><strong>Strategic Leverage:</strong> ${T(d.lev)}</p>
       <p style="margin:0"><strong>2026–2027 Outlook:</strong> ${T(d.fc)}</p>
       <p style="margin:0"><strong>Key Risks:</strong> ${T(d.rk)}</p>
     </div>
     <div class="src-row">${(d.src || []).map(([l, u]) => `<a class="src-link" href="${u}" target="_blank" rel="noopener noreferrer">↗ ${l}</a>`).join("")}</div>
-    ${d.dem ? "" : `<div style="margin-top:14px"><button class="btn btn-amber" data-stress-go="${cn}">Simulate ${cn} Offline in War-Room →</button></div>`}
+    ${d.dem ? "" : `<div style="margin-top:16px"><button class="btn btn-amber" data-stress-go="${cn}">Simulate ${cn} Offline in War-Room →</button></div>`}
   `;
   $("#dosModal").classList.add("open");
   if (d.h && typeof Chart !== "undefined") {
-    const isLight = state.theme === "light", tc = isLight ? "#5a6d80" : "#8ea2b5", gc = isLight ? "rgba(13,26,38,.09)" : "rgba(255,255,255,.08)";
+    const isLight = state.theme === "light", tc = isLight ? "#475569" : "#cbd5e1", gc = isLight ? "rgba(15,23,42,.08)" : "rgba(255,255,255,.08)";
     if (dosChartInst) dosChartInst.destroy();
     dosChartInst = new Chart($("#dosChart"), {
       type: "bar",
       data: { labels: d.h.l, datasets: [{ data: d.h.v, backgroundColor: C[d.cty][1], borderRadius: 6 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: tc }, grid: { display: false } }, y: { ticks: { color: tc }, grid: { color: gc } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: tc, font: { size: 11, family: "IBM Plex Sans" } }, grid: { display: false } }, y: { ticks: { color: tc, font: { size: 11, family: "JetBrains Mono" } }, grid: { color: gc } } } }
     });
   }
 }
@@ -1824,13 +2544,54 @@ function openCmd() { $("#cmdModal").classList.add("open"); $("#cmdInput").value 
 function closeModals() { $("#dosModal").classList.remove("open"); $("#cmdModal").classList.remove("open"); }
 function goStep(i) { state.cur = Math.max(0, Math.min(S.length - 1, i)); renderTopo(); renderDetail(); }
 
+// KEYBOARD TAB NAVIGATION (ARIA compliant roving tabindex)
+const tabButtons = () => $$(".nav-tab");
+function onTabKeydown(e) {
+  const tabs = tabButtons();
+  const idx = tabs.indexOf(document.activeElement);
+  if (idx < 0) return;
+  if (e.key === "ArrowRight") {
+    e.preventDefault();
+    const next = tabs[(idx + 1) % tabs.length];
+    next.focus();
+    switchTab(next.dataset.tab);
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault();
+    const prev = tabs[(idx - 1 + tabs.length) % tabs.length];
+    prev.focus();
+    switchTab(prev.dataset.tab);
+  } else if (e.key === "Home") {
+    e.preventDefault();
+    tabs[0].focus();
+    switchTab(tabs[0].dataset.tab);
+  } else if (e.key === "End") {
+    e.preventDefault();
+    tabs[tabs.length - 1].focus();
+    switchTab(tabs[tabs.length - 1].dataset.tab);
+  }
+}
+
 // EVENTS
 document.addEventListener("click", e => {
   const tab = e.target.closest(".nav-tab");
   if (tab) { switchTab(tab.dataset.tab); return; }
   if (e.target.id === "themeToggle") { state.theme = state.theme === "dark" ? "light" : "dark"; applyTheme(); return; }
   if (e.target.id === "openCmd") { openCmd(); return; }
+  if (e.target.id === "copyShareBtn") {
+    const url = window.location.origin + window.location.pathname + "#" + state.tab;
+    navigator.clipboard.writeText(url).then(() => showToast("Direct link to #" + state.tab + " copied!"))
+      .catch(() => showToast("URL ready: #" + state.tab));
+    return;
+  }
   if (e.target.id === "closeDos" || e.target.id === "closeCmd" || e.target.id === "dosModal" || e.target.id === "cmdModal") { closeModals(); return; }
+
+  const jt = e.target.closest("[data-jump-tab]");
+  if (jt) {
+    const t = jt.dataset.jumpTab;
+    if (jt.dataset.jumpStep !== undefined) state.cur = parseInt(jt.dataset.jumpStep, 10);
+    switchTab(t);
+    return;
+  }
 
   const tn = e.target.closest(".t-node");
   if (tn) { goStep(parseInt(tn.dataset.step, 10)); return; }
@@ -1911,21 +2672,36 @@ document.addEventListener("change", e => {
 });
 
 document.addEventListener("keydown", e => {
+  if (document.activeElement.classList.contains("nav-tab")) {
+    onTabKeydown(e);
+  }
   if (e.key === "Escape") { closeModals(); return; }
   if ((e.key === "/" || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k")) && document.activeElement.tagName !== "INPUT") {
     e.preventDefault(); openCmd(); return;
   }
-  if (state.tab === "topology" && !$("#dosModal").classList.contains("open") && !$("#cmdModal").classList.contains("open")) {
+  if (state.tab === "topology" && !$("#dosModal").classList.contains("open") && !$("#cmdModal").classList.contains("open") && document.activeElement.tagName !== "INPUT") {
     if (e.key === "ArrowRight") goStep(state.cur + 1);
     if (e.key === "ArrowLeft") goStep(state.cur - 1);
   }
 });
 
-// INIT
+// HASH ROUTING & INIT
+window.addEventListener("hashchange", () => {
+  const h = window.location.hash.replace("#", "");
+  if (["topology", "schematics", "economics", "physics", "warroom", "labs", "dossiers"].includes(h)) {
+    switchTab(h, false);
+  }
+});
+
 initTheme();
-renderLegend();
-renderTopo();
-renderDetail();
+const initHash = window.location.hash.replace("#", "");
+if (["topology", "schematics", "economics", "physics", "warroom", "labs", "dossiers"].includes(initHash)) {
+  switchTab(initHash, false);
+} else {
+  renderLegend();
+  renderTopo();
+  renderDetail();
+}
 </script>
 </body>
 </html>
