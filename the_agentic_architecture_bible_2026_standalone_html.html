@@ -1,0 +1,3362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Agentic Architecture Bible (2026) — Engineering Cockpit</title>
+  <!-- Optional web fonts with graceful offline system fallbacks -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ========================================================================
+       DESIGN TOKENS & RESET (Linear / Vercel / Raycast Obsidian Cockpit)
+    ======================================================================== */
+    :root {
+      --bg-canvas: #07090F;
+      --bg-surface: #0D111A;
+      --bg-elevated: #131926;
+      --bg-hover: #192234;
+      --border-hairline: rgba(255, 255, 255, 0.08);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --cyan: #22D3EE;
+      --cyan-soft: rgba(34, 211, 238, 0.12);
+      --cyan-border: rgba(34, 211, 238, 0.35);
+
+      --indigo: #818CF8;
+      --indigo-soft: rgba(129, 140, 248, 0.12);
+      --indigo-border: rgba(129, 140, 248, 0.35);
+
+      --emerald: #34D399;
+      --emerald-soft: rgba(52, 211, 153, 0.12);
+      --emerald-border: rgba(52, 211, 153, 0.35);
+
+      --amber: #FBBF24;
+      --amber-soft: rgba(251, 191, 36, 0.12);
+      --amber-border: rgba(251, 191, 36, 0.35);
+
+      --rose: #FB7185;
+      --rose-soft: rgba(251, 113, 133, 0.12);
+      --rose-border: rgba(251, 113, 133, 0.35);
+
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --shadow-card: 0 10px 30px -10px rgba(0, 0, 0, 0.65);
+      --shadow-glow-cyan: 0 0 32px rgba(34, 211, 238, 0.12);
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg-canvas);
+      background-image:
+        radial-gradient(ellipse 80% 50% at 15% -10%, rgba(99, 102, 241, 0.14), transparent 60%),
+        radial-gradient(ellipse 70% 45% at 85% -5%, rgba(34, 211, 238, 0.10), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 50% 110%, rgba(52, 211, 153, 0.07), transparent 60%);
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+
+    /* Subtle engineering dot/grid overlay */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse at center, black 35%, transparent 85%);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-canvas); }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.14); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.24); }
+
+    button, input, select { font-family: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: none; }
+
+    .mono { font-family: var(--font-mono); }
+    .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ========================================================================
+       STICKY FROSTED HEADER & NAVIGATION
+    ======================================================================== */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(7, 9, 15, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .header-inner {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #22D3EE 0%, #6366F1 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #07090F;
+      box-shadow: 0 0 22px rgba(34, 211, 238, 0.28);
+      flex-shrink: 0;
+    }
+
+    .brand-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .edition-pill {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      border: 1px solid var(--cyan-border);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 2px;
+      scrollbar-width: none;
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+
+    .nav-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      border: 1px solid transparent;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-tab.active {
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+      border-color: var(--cyan-border);
+      box-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
+    }
+
+    .nav-tab.active svg { color: var(--cyan); }
+
+    .kbd {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .nav-tab.active .kbd {
+      background: var(--cyan-soft);
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+    }
+
+    .cmd-trigger {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 12px;
+      border-radius: 10px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+      font-size: 12.5px;
+      transition: all var(--transition);
+      flex-shrink: 0;
+    }
+
+    .cmd-trigger:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+    }
+
+    /* ========================================================================
+       MAIN LAYOUT & SHARED COMPONENTS
+    ======================================================================== */
+    .main-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 24px 20px 64px;
+    }
+
+    .module-panel {
+      display: none;
+      animation: fadeSlideIn 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .module-panel.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .card-elevated {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .section-kicker {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    .section-desc {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 99px;
+      border: 1px solid var(--border-hairline);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+    }
+    .badge-cyan { background: var(--cyan-soft); color: var(--cyan); border-color: var(--cyan-border); }
+    .badge-indigo { background: var(--indigo-soft); color: var(--indigo); border-color: var(--indigo-border); }
+    .badge-emerald { background: var(--emerald-soft); color: var(--emerald); border-color: var(--emerald-border); }
+    .badge-amber { background: var(--amber-soft); color: var(--amber); border-color: var(--amber-border); }
+    .badge-rose { background: var(--rose-soft); color: var(--rose); border-color: var(--rose-border); }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #22D3EE 0%, #38BDF8 100%);
+      color: #050811;
+      font-size: 13px;
+      font-weight: 700;
+      transition: all var(--transition);
+      box-shadow: 0 4px 18px rgba(34, 211, 238, 0.25);
+    }
+    .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.08); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-size: 12.5px;
+      font-weight: 500;
+      transition: all var(--transition);
+    }
+    .btn-secondary:hover {
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+      background: rgba(34, 211, 238, 0.06);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .stack-gap { display: flex; flex-direction: column; gap: 20px; }
+
+    /* ========================================================================
+       MODULE 1: DECISION ENGINE
+    ======================================================================== */
+    .selector-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .archetype-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .pill-card {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 13px;
+      border-radius: 12px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      text-align: left;
+      transition: all var(--transition);
+    }
+    .pill-card:hover {
+      border-color: var(--border-strong);
+      background: var(--bg-elevated);
+    }
+    .pill-card.selected {
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.12), rgba(99, 102, 241, 0.08));
+      border-color: var(--cyan-border);
+      box-shadow: 0 0 22px rgba(34, 211, 238, 0.1);
+    }
+
+    .pill-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+    .pill-card.selected .pill-icon {
+      background: var(--cyan-soft);
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+    }
+
+    .pill-title { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .pill-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+    .choice-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .choice-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 13px;
+      border-radius: 10px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .choice-pill:hover { border-color: var(--border-strong); color: var(--text-primary); }
+    .choice-pill.selected-indigo {
+      background: var(--indigo-soft);
+      border-color: var(--indigo-border);
+      color: #E0E7FF;
+    }
+    .choice-pill.selected-emerald {
+      background: var(--emerald-soft);
+      border-color: var(--emerald-border);
+      color: #D1FAE5;
+    }
+
+    /* 5-Layer Visual Pipeline */
+    .pipeline-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      position: relative;
+    }
+
+    .pipeline-node {
+      position: relative;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color var(--transition);
+    }
+    .pipeline-node:hover { border-color: var(--cyan-border); }
+
+    .pipeline-arrow {
+      position: absolute;
+      right: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--cyan-border);
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pipeline-step {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 8px;
+      display: inline-block;
+    }
+    .pipeline-tech {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+      line-height: 1.35;
+    }
+    .pipeline-role { font-size: 12px; color: var(--text-secondary); }
+
+    /* Timeline */
+    .timeline-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      position: relative;
+    }
+    .timeline-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: 12px;
+      padding: 15px;
+      border-top-width: 2px;
+    }
+
+    .callout-box {
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border-hairline);
+    }
+    .callout-indigo { background: rgba(99, 102, 241, 0.08); border-color: var(--indigo-border); }
+    .callout-emerald { background: rgba(16, 185, 129, 0.08); border-color: var(--emerald-border); }
+    .callout-amber { background: rgba(245, 158, 11, 0.08); border-color: var(--amber-border); }
+    .callout-rose { background: rgba(244, 63, 94, 0.08); border-color: var(--rose-border); }
+
+    .list-clean {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .list-clean li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.45;
+    }
+
+    /* ========================================================================
+       MODULE 2: USE-CASE BIBLE & SLIDE-OVER DRAWER
+    ======================================================================== */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      width: 290px;
+      max-width: 100%;
+    }
+    .search-box svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
+      width: 100%;
+      padding: 9px 12px 9px 36px;
+      border-radius: 10px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .search-input:focus { border-color: var(--cyan-border); }
+
+    .bp-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: left;
+    }
+    .bp-card:hover {
+      border-color: var(--cyan-border);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px -12px rgba(34, 211, 238, 0.16);
+      background: #101623;
+    }
+
+    .diff-shift {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+    }
+
+    /* Slide-over Drawer */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(3, 5, 10, 0.72);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 220ms ease;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 65;
+      width: min(740px, 100vw);
+      background: var(--bg-surface);
+      border-left: 1px solid var(--border-strong);
+      box-shadow: -24px 0 60px rgba(0, 0, 0, 0.7);
+      transform: translateX(100%);
+      transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer-panel.open { transform: translateX(0); }
+
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-hairline);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(7, 9, 15, 0.65);
+    }
+    .drawer-body {
+      padding: 22px 24px 32px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-hairline);
+      background: rgba(7, 9, 15, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .ascii-box {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      line-height: 1.45;
+      background: #06080E;
+      border: 1px solid var(--border-hairline);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #A5F3FC;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    /* ========================================================================
+       MODULE 3: RUNTIME ARENA & FEEDBACK LOOP VISUALIZER
+    ======================================================================== */
+    .segmented {
+      display: inline-flex;
+      background: var(--bg-canvas);
+      padding: 4px;
+      border-radius: 11px;
+      border: 1px solid var(--border-hairline);
+      gap: 4px;
+    }
+    .seg-btn {
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+    .seg-btn.active-emerald {
+      background: var(--emerald-soft);
+      color: var(--emerald);
+      border: 1px solid var(--emerald-border);
+    }
+    .seg-btn.active-rose {
+      background: var(--rose-soft);
+      color: var(--rose);
+      border: 1px solid var(--rose-border);
+    }
+    .seg-btn.active-cyan {
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      border: 1px solid var(--cyan-border);
+    }
+
+    .loop-stage {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: 13px;
+      padding: 15px;
+      transition: all 260ms ease;
+      position: relative;
+      cursor: pointer;
+    }
+    .loop-stage.pulse-emerald {
+      border-color: var(--emerald-border);
+      background: rgba(52, 211, 153, 0.09);
+      box-shadow: 0 0 24px rgba(52, 211, 153, 0.14);
+      transform: translateY(-2px);
+    }
+    .loop-stage.pulse-rose {
+      border-color: var(--rose-border);
+      background: rgba(251, 113, 133, 0.09);
+      box-shadow: 0 0 24px rgba(251, 113, 133, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .bar-track {
+      height: 8px;
+      width: 100%;
+      background: var(--bg-canvas);
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid var(--border-hairline);
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 420ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .arena-table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-surface);
+    }
+    table.arena-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 880px;
+      text-align: left;
+    }
+    table.arena-table th {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      background: var(--bg-canvas);
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    table.arena-table th:hover { color: var(--cyan); }
+    table.arena-table td {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--border-hairline);
+      vertical-align: top;
+      font-size: 13px;
+    }
+    table.arena-table tr:last-child td { border-bottom: none; }
+    table.arena-table tbody tr:hover { background: rgba(255, 255, 255, 0.025); }
+
+    /* ========================================================================
+       MODULE 4: COST-AT-SCALE PRICING LAB
+    ======================================================================== */
+    .slider-card {
+      background: var(--bg-canvas);
+      border: 1px solid var(--border-hairline);
+      border-radius: 13px;
+      padding: 15px;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 99px;
+      background: #1E293B;
+      outline: none;
+      margin: 12px 0 6px;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan);
+      border: 2px solid #07090F;
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+      cursor: pointer;
+      transition: transform 120ms ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan);
+      border: 2px solid #07090F;
+      cursor: pointer;
+    }
+
+    .cost-bar-track {
+      height: 14px;
+      background: var(--bg-canvas);
+      border-radius: 99px;
+      border: 1px solid var(--border-hairline);
+      overflow: hidden;
+    }
+    .cost-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 360ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ========================================================================
+       MODULE 5: PER-STACK AGENT SETUP FILES
+    ======================================================================== */
+    .setup-layout {
+      display: grid;
+      grid-template-columns: 330px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .code-shell {
+      background: #060911;
+      border: 1px solid var(--border-hairline);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .code-toolbar {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-hairline);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .code-viewer {
+      padding: 20px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.65;
+      color: #CBD5E1;
+      overflow-x: auto;
+      max-height: 72vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .syn-h1 { color: #22D3EE; font-weight: 700; }
+    .syn-h2 { color: #818CF8; font-weight: 700; }
+    .syn-bullet { color: #34D399; font-weight: 600; }
+    .syn-code { color: #FBBF24; }
+    .syn-comment { color: #64748B; }
+    .syn-warn { color: #FB7185; font-weight: 700; }
+
+    /* ========================================================================
+       COMMAND PALETTE (Cmd+K / Ctrl+K) & TOAST
+    ======================================================================== */
+    .cmd-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(3, 5, 10, 0.78);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 10vh 16px 16px;
+    }
+    .cmd-backdrop.open { display: flex; }
+
+    .cmd-modal {
+      width: min(640px, 100%);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      animation: fadeSlideIn 160ms ease;
+    }
+
+    .cmd-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+    .cmd-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      color: var(--text-primary);
+    }
+
+    .cmd-results {
+      max-height: 390px;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .cmd-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      text-align: left;
+      transition: background 100ms ease;
+    }
+    .cmd-item:hover, .cmd-item.active {
+      background: var(--bg-elevated);
+    }
+    .cmd-item.active {
+      outline: 1px solid var(--cyan-border);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 95;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #0F172A;
+      border: 1px solid var(--emerald-border);
+      color: #ECFDF5;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      transform: translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    .footer {
+      border-top: 1px solid var(--border-hairline);
+      padding: 20px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-inner {
+      max-width: 1340px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ========================================================================
+       RESPONSIVE BREAKPOINTS
+    ======================================================================== */
+    @media (max-width: 1100px) {
+      .pipeline-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pipeline-arrow { display: none; }
+      .setup-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 860px) {
+      .archetype-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3, .timeline-grid { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .archetype-grid { grid-template-columns: 1fr; }
+      .pipeline-grid { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .header-inner { padding: 10px 14px; }
+      .main-wrap { padding: 16px 14px 48px; }
+      .card { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <!-- ======================================================================
+       STICKY FROSTED TOP HEADER
+  ====================================================================== -->
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" id="brand-logo"></div>
+        <div>
+          <div class="brand-title-row">
+            <span class="brand-title">The Agentic Architecture Bible</span>
+            <span class="edition-pill">2026 SoTA</span>
+          </div>
+          <div class="brand-sub">Local Prototype → Multi-User SaaS → Enterprise Platform</div>
+        </div>
+      </div>
+
+      <nav class="nav-tabs" id="main-nav" aria-label="Primary modules"></nav>
+
+      <button class="cmd-trigger" id="open-cmd-btn" title="Open Command Palette (Cmd+K or Ctrl+K)">
+        <span id="cmd-search-icon" style="display:inline-flex;"></span>
+        <span>Quick Jump</span>
+        <span class="kbd">⌘K</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ======================================================================
+       MAIN 5-MODULE COCKPIT
+  ====================================================================== -->
+  <main class="main-wrap">
+    <!-- MODULE 1: DECISION ENGINE -->
+    <section id="panel-decision" class="module-panel active"></section>
+
+    <!-- MODULE 2: USE-CASE BIBLE -->
+    <section id="panel-bible" class="module-panel"></section>
+
+    <!-- MODULE 3: RUNTIME ARENA & FEEDBACK LOOP -->
+    <section id="panel-arena" class="module-panel"></section>
+
+    <!-- MODULE 4: COST-AT-SCALE PRICING LAB -->
+    <section id="panel-cost" class="module-panel"></section>
+
+    <!-- MODULE 5: PER-STACK AGENT SETUP FILES -->
+    <section id="panel-setup" class="module-panel"></section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>THE AGENTIC ARCHITECTURE BIBLE // STANDALONE 2026 ENGINEERING COCKPIT</div>
+      <div>PRESS <span class="kbd">1</span>–<span class="kbd">5</span> TO SWITCH MODULES · <span class="kbd">⌘K</span> OR <span class="kbd">/</span> TO SEARCH EVERYTHING</div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================
+       SLIDE-OVER DETAIL DRAWER (MODULE 2)
+  ====================================================================== -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="drawer-panel" id="drawer-panel" aria-hidden="true"></aside>
+
+  <!-- ======================================================================
+       COMMAND PALETTE MODAL (Cmd+K / Ctrl+K)
+  ====================================================================== -->
+  <div class="cmd-backdrop" id="cmd-backdrop" role="dialog" aria-modal="true" aria-label="Command Palette">
+    <div class="cmd-modal" id="cmd-modal">
+      <div class="cmd-input-row">
+        <span id="cmd-modal-icon" style="color: var(--cyan); display:inline-flex;"></span>
+        <input type="text" id="cmd-input" class="cmd-input" placeholder="Jump to any blueprint, runtime, cost preset, or AGENTS.md..." autocomplete="off" />
+        <span class="kbd">ESC</span>
+      </div>
+      <div class="cmd-results" id="cmd-results"></div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       TOAST NOTIFICATION
+  ====================================================================== -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ======================================================================
+       APPLICATION DATA & ENGINE (VANILLA ES6+)
+  ====================================================================== -->
+  <script>
+    (() => {
+      'use strict';
+
+      /* --------------------------------------------------------------------
+         1. INLINE CRISP SVG ICONS
+      -------------------------------------------------------------------- */
+      const icon = (path, size = 16) =>
+        `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+
+      const ICONS = {
+        cpu: (s=16) => icon('<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>', s),
+        sliders: (s=16) => icon('<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="2" y1="14" x2="6" y2="14"/><line x1="10" y1="8" x2="14" y2="8"/><line x1="18" y1="16" x2="22" y2="16"/>', s),
+        layers: (s=16) => icon('<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>', s),
+        dollar: (s=16) => icon('<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>', s),
+        fileCode: (s=16) => icon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><polyline points="10 13 8 15 10 17"/><polyline points="14 13 16 15 14 17"/>', s),
+        search: (s=16) => icon('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>', s),
+        terminal: (s=16) => icon('<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>', s),
+        radio: (s=16) => icon('<circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/>', s),
+        puzzle: (s=16) => icon('<path d="M19.439 7.85c-.049.322.059.648.289.878l1.568 1.568c.47.47.706 1.087.706 1.704s-.235 1.233-.706 1.704l-1.611 1.611a.98.98 0 0 1-.837.276c-.47-.07-.802-.48-.968-.925a2.501 2.501 0 1 0-3.214 3.214c.446.166.855.497.925.968a.979.979 0 0 1-.276.837l-1.61 1.61a2.404 2.404 0 0 1-1.705.707 2.402 2.402 0 0 1-1.704-.706l-1.568-1.568a1.026 1.026 0 0 0-.877-.29c-.493.074-.84.504-1.02.968a2.5 2.5 0 1 1-3.237-3.237c.464-.18.894-.527.967-1.02a1.026 1.026 0 0 0-.289-.877l-1.568-1.568A2.402 2.402 0 0 1 1.998 12c0-.617.236-1.234.706-1.704L4.23 8.77c.24-.24.581-.353.917-.303.515.077.877.528 1.073 1.01a2.5 2.5 0 1 0 3.259-3.259c-.482-.196-.933-.558-1.01-1.073-.05-.336.062-.676.303-.917l1.525-1.525A2.402 2.402 0 0 1 12 1.998c.617 0 1.234.236 1.704.706l1.568 1.568c.23.23.556.338.877.29.493-.074.84-.504 1.02-.968a2.5 2.5 0 1 1 3.237 3.237c-.464.18-.894.527-.967 1.02Z"/>', s),
+        globe: (s=16) => icon('<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>', s),
+        building: (s=16) => icon('<rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/>', s),
+        monitor: (s=16) => icon('<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>', s),
+        bot: (s=16) => icon('<rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/>', s),
+        users: (s=16) => icon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', s),
+        sparkles: (s=16) => icon('<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/>', s),
+        arrowRight: (s=15) => icon('<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>', s),
+        check: (s=15) => icon('<polyline points="20 6 9 17 4 12"/>', s),
+        checkCircle: (s=15) => icon('<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', s),
+        alert: (s=15) => icon('<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', s),
+        x: (s=16) => icon('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', s),
+        copy: (s=15) => icon('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>', s),
+        download: (s=15) => icon('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>', s),
+        zap: (s=15) => icon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>', s),
+        shield: (s=15) => icon('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', s),
+        play: (s=14) => icon('<polygon points="5 3 19 12 5 21 5 3"/>', s),
+        award: (s=18) => icon('<circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>', s)
+      };
+
+      /* --------------------------------------------------------------------
+         2. DATA: 9 COMPLETE USE-CASE BLUEPRINTS
+      -------------------------------------------------------------------- */
+      const BLUEPRINTS = [
+        {
+          id: 'personal-tool',
+          shortTitle: 'Personal Quick Tool',
+          title: 'Personal Quick Tool & Local Utility',
+          category: 'Personal',
+          icon: 'terminal',
+          accent: 'emerald',
+          preAiDifficulty: 'Weekend Setup',
+          postAiDifficulty: '15 Mins',
+          superpower: 'Single-file Bun + SQLite app with instant UI, zero servers, and 1-command upgrade to SaaS.',
+          primaryStack: 'Bun + Hono + bun:sqlite + React 19 + Tailwind',
+          altStack: 'Python + FastAPI + DuckDB + Streamlit',
+          trapStack: 'Next.js + Prisma + Docker Postgres + Redis (Massive over-engineering for 1 user)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'React 19 + Tailwind', role: 'Instant local SPA / PWA' },
+            { layer: 'Runtime / API', tech: 'Bun + Hono', role: 'Sub-15ms single process' },
+            { layer: 'Data & Sync', tech: 'bun:sqlite (WAL)', role: 'Single-file ACID DB' },
+            { layer: 'Edge / Deploy', tech: 'Localhost / Tailscale', role: 'Private mesh on all devices' },
+            { layer: 'Agentic Guardrails', tech: 'Strict TS + Biome + bun test', role: 'Zero-config instant checks' }
+          ],
+          agenticUnlock: 'Because Bun eliminates Webpack/Babel/Node ESM friction and embeds SQLite natively, frontier models like Gemini Neon spend 100% of their context building features instead of fighting build configs.',
+          pre2025Bottleneck: 'Spinning up a polished local GUI for personal scripts meant hours of boilerplate, CORS headaches, and database setup—so most tools stayed ugly CLI scripts.',
+          upgradePath: {
+            day1: 'Single `bun run index.ts` with `bun:sqlite` on localhost, shared to your phone via Tailscale.',
+            saas: 'Swap `bun:sqlite` for Turso (libSQL) or Neon Postgres via Drizzle ORM; drop in BetterAuth for multi-user logins.',
+            enterprise: 'Deploy the exact same Hono routes to Fly.io containers or Cloudflare Workers with zero business-logic rewrites.'
+          },
+          pros: [
+            'Sub-15ms startup and 3-5x faster local SQLite reads than Node/Python.',
+            'One language (strict TS) across DB schema, API, and frontend UI.',
+            'Compiles to a standalone binary via `bun build --compile`.'
+          ],
+          cons: [
+            'Smaller native scientific/ML library ecosystem than Python.',
+            'SQLite single-writer lock needs care under heavy concurrent writes.'
+          ],
+          costSnapshot: { u1k: '$0 / mo (Local / Free)', u100k: '$25 / mo (Fly + Turso)', u10m: '$240 / mo (Postgres + Edge)' },
+          ascii: `[Browser / Tailscale Phone]
+          │ HTTP / SSE
+          ▼
+┌──────────────────────────────┐
+│  Bun Single Process (Hono)   │  <-- Serves React UI + Typed RPC
+└──────────────┬───────────────┘
+               │ Native C-speed binding
+               ▼
+      [ local.db (bun:sqlite) ]`,
+          setupId: 'bun-saas',
+          starterPrompt: 'Build a local-first personal tool using Bun, Hono, Drizzle ORM with bun:sqlite (WAL mode), and a clean React + Tailwind UI. Keep everything in a single clean monorepo with strict TypeScript, Zod request validation, and `bun test` integration tests. Make it trivial to swap SQLite for Postgres later.'
+        },
+        {
+          id: 'multi-saas',
+          shortTitle: 'Multi-Tenant SaaS',
+          title: 'Multi-Tenant SaaS Workhorse',
+          category: 'SaaS',
+          icon: 'layers',
+          accent: 'indigo',
+          preAiDifficulty: '4–6 Weeks',
+          postAiDifficulty: '1–2 Days',
+          superpower: 'End-to-end type safety from Postgres 18 column -> Hono RPC -> React hooks with $0 egress.',
+          primaryStack: 'Bun + Hono RPC + PostgreSQL 18 + Drizzle + BetterAuth + R2',
+          altStack: 'Go + Chi + sqlc + React (Vite) + Postgres',
+          trapStack: 'Microservices + Kubernetes + Paid Per-MAU Auth + S3 Egress before PMF',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'React 19 / Next.js 16', role: 'SSR Marketing + Fast App' },
+            { layer: 'Runtime / API', tech: 'Bun + Hono RPC', role: 'Typed API + Background Jobs' },
+            { layer: 'Data & Sync', tech: 'Postgres 18 + Drizzle', role: 'Multi-Tenant RLS + pgvector' },
+            { layer: 'Edge / Deploy', tech: 'Cloudflare R2 + Fly.io', role: '$0 Egress + Global CDN' },
+            { layer: 'Agentic Guardrails', tech: 'tsc --noEmit + Drizzle Check', role: 'Cross-stack break detection' }
+          ],
+          agenticUnlock: 'Full-stack TypeScript inference acts as an automatic neural guardrail: if an AI agent renames a DB column in Drizzle, `tsc --noEmit` immediately flags every affected API handler and React component.',
+          pre2025Bottleneck: 'Wiring multi-tenant orgs, Stripe webhooks, RBAC, email queues, and migrations took solo founders a full month before writing a single differentiating feature.',
+          upgradePath: {
+            day1: 'Single Bun monorepo + local Docker Postgres + BetterAuth + Stripe CLI webhooks.',
+            saas: 'Managed Postgres (Neon/Supabase), Cloudflare R2 for files, automated CI migrations.',
+            enterprise: 'Postgres Row-Level Security (RLS), read replicas, SSO/SAML, and Go/Rust hot-path offload.'
+          },
+          pros: [
+            'Highest frontier LLM codegen fluency of any full-stack combination.',
+            'BetterAuth stores users in your own Postgres DB (no per-MAU auth tax).',
+            'Postgres 18 handles relational, JSONB, full-text, and pgvector in one DB.'
+          ],
+          cons: [
+            'Higher idle RAM (~90MB) than compiled Go (~18MB) or Rust (~8MB).',
+            'Heavy CPU work (PDF/video) must be offloaded to worker threads or queues.'
+          ],
+          costSnapshot: { u1k: '$0 – $15 / mo', u100k: '$95 – $220 / mo', u10m: '$1,400 / mo (vs $8k AWS)' },
+          ascii: `[Users] ──► [Cloudflare CDN / WAF] ──► [R2 Assets ($0 Egress)]
+                    │
+                    ▼
+          [Bun + Hono RPC API] ◄── Shared Zod + Types
+                    │
+                    ▼
+   [PostgreSQL 18 (RLS + pgvector)] + [BetterAuth]`,
+          setupId: 'bun-saas',
+          starterPrompt: 'Scaffold a multi-tenant SaaS monorepo using Bun workspaces, Hono RPC, Drizzle ORM with PostgreSQL 18, BetterAuth (organization plugin), and React + Tailwind. Enforce tenant isolation by organizationId on every query, validate all inputs with Zod, and include a working `bun run verify` script.'
+        },
+        {
+          id: 'realtime-game',
+          shortTitle: 'Realtime Multiplayer / Game',
+          title: 'Realtime Multiplayer Games & Live Canvases',
+          category: 'Realtime',
+          icon: 'radio',
+          accent: 'amber',
+          preAiDifficulty: '3–6 Months',
+          postAiDifficulty: '2–3 Days',
+          superpower: 'Single-threaded stateful rooms (Durable Objects / SpacetimeDB) with 60Hz ticks & hibernating WS.',
+          primaryStack: 'Cloudflare Durable Objects (Hibernatable WS) + HTML5 Canvas/WebGPU (or SpacetimeDB Rust)',
+          altStack: 'Go + Coder WebSockets + Redis Pub/Sub on Fly.io',
+          trapStack: 'AWS Lambda + API Gateway WebSockets + DynamoDB polling (High latency & brutal billing)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'Canvas / WebGPU + Prediction', role: '60fps Interpolated Client' },
+            { layer: 'Runtime / API', tech: 'Durable Objects / SpacetimeDB', role: 'Authoritative Room Actor' },
+            { layer: 'Data & Sync', tech: 'Embedded SQLite / Delta Sync', role: 'Sub-ms Room State' },
+            { layer: 'Edge / Deploy', tech: 'Anycast Edge Sticky Routing', role: 'Lowest Ping Region' },
+            { layer: 'Agentic Guardrails', tech: 'Binary Protocol Schema + Rust/TS', role: 'Zero Desync Contracts' }
+          ],
+          agenticUnlock: 'Actor-model rooms eliminate distributed locks and Redis pub/sub race conditions. AI agents write clean sequential tick logic inside a single room class while the platform scales to 100,000+ rooms.',
+          pre2025Bottleneck: 'Authoritative multiplayer required custom sticky-session load balancers, Redis backplanes, state reconciliation, and dedicated DevOps to survive viral spikes.',
+          upgradePath: {
+            day1: 'Single Durable Object or SpacetimeDB module running locally with Canvas client.',
+            saas: 'Enable WebSocket Hibernation API (idle connections cost $0) + R2 replay storage.',
+            enterprise: 'For 1,000-player single-shard physics, deploy Rust/SpacetimeDB bare-metal regional clusters.'
+          },
+          pros: [
+            'Zero Redis glue: every room has strong single-threaded consistency.',
+            'Hibernatable WebSockets slash idle connection bills by up to 95%.',
+            'Embedded SQLite inside every room gives sub-millisecond persistence.'
+          ],
+          cons: [
+            'Platform-specific actor model (Cloudflare DO or SpacetimeDB).',
+            'For raw UDP/WebRTC voice/video relays, pair with LiveKit or Go.'
+          ],
+          costSnapshot: { u1k: '$5 / mo', u100k: '$65 – $180 / mo', u10m: '$1,100 / mo (Hibernated)' },
+          ascii: `[Player A] ──WS──┐
+                 ├──► [Edge Anycast] ──► [Room Actor (DO / Rust)]
+[Player B] ──WS──┘                        ├─ 60Hz Authoritative Loop
+                                          └─ Embedded SQLite Snapshot`,
+          setupId: 'realtime-game',
+          starterPrompt: 'Create an authoritative multiplayer game engine using Cloudflare Durable Objects with the WebSocket Hibernation API (or SpacetimeDB Rust) and an HTML5 Canvas client with client-side prediction and server reconciliation. Include typed binary/JSON protocol schemas and tick-rate tests.'
+        },
+        {
+          id: 'ai-extension',
+          shortTitle: 'AI Browser Extension',
+          title: 'AI Browser Extensions & Web Overlays',
+          category: 'Extension',
+          icon: 'puzzle',
+          accent: 'cyan',
+          preAiDifficulty: '2–3 Weeks',
+          postAiDifficulty: '1 Day',
+          superpower: 'WXT + Shadow DOM mounts Tailwind React copilots onto any site without CSS collisions.',
+          primaryStack: 'WXT + Vite + React 19 + Shadow DOM + Cloudflare Workers Backend',
+          altStack: 'CRXJS + Raw Vite + Manifest V3 JSON',
+          trapStack: 'Plasmo (maintenance mode) or raw document.body injection (CSS breaks host pages)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'WXT + createShadowRootUi', role: 'CSS-Isolated Page Overlay' },
+            { layer: 'Runtime / API', tech: 'MV3 Service Worker + Workers', role: 'Stateless Bridge + LLM Proxy' },
+            { layer: 'Data & Sync', tech: 'wxt/storage + D1 / Postgres', role: 'Local Cache + Cloud Sync' },
+            { layer: 'Edge / Deploy', tech: 'Chrome / Firefox / Safari Stores', role: 'Multi-Browser Auto-Zip' },
+            { layer: 'Agentic Guardrails', tech: 'wxt prepare + tsc + build', role: 'Cross-browser MV3 Checks' }
+          ],
+          agenticUnlock: 'WXT’s file-based entrypoints (`entrypoints/popup`, `entrypoints/content.ts`, `entrypoints/sidepanel`) give AI coding agents a rigid, unmistakable structure that prevents Manifest V3 CSP and lifecycle bugs.',
+          pre2025Bottleneck: 'Injecting a styled React copilot into Gmail, LinkedIn, or Notion without breaking host CSS or losing state when MV3 service workers slept required fragile webpack hacks.',
+          upgradePath: {
+            day1: 'Local unpacked Chrome extension with instant Vite HMR (`wxt dev`).',
+            saas: 'Cloudflare Workers proxy for Stripe licensing & secure LLM keys; ship to Chrome & Firefox stores.',
+            enterprise: 'Enterprise Chrome MDM policies, Safari Web Extension build, and SOC2 audit proxy.'
+          },
+          pros: [
+            'Actively maintained 2026 Vite standard (replaces legacy Plasmo).',
+            'First-class Shadow DOM helper guarantees zero CSS leakage.',
+            'Single codebase compiles cleanly for Chrome, Firefox, Edge, and Safari.'
+          ],
+          cons: [
+            'Store review cycles (Chrome Web Store / Apple) gate production releases.',
+            'MV3 Service Workers sleep after 30s—never store state in RAM.'
+          ],
+          costSnapshot: { u1k: '$0 / mo', u100k: '$25 – $80 / mo (API Proxy)', u10m: '$450 / mo (Workers Edge)' },
+          ascii: `[Host Page DOM (Gmail/X)]
+   └─ ShadowRoot (Isolated Tailwind + React Overlay)
+          │ Typed Messaging
+          ▼
+   [MV3 Service Worker] ──HTTPS/SSE──► [CF Workers LLM Proxy]`,
+          setupId: 'wxt-ext',
+          starterPrompt: 'Build a cross-browser Manifest V3 AI copilot extension using WXT, Vite, TypeScript, React, and Tailwind. Mount the in-page overlay via `createShadowRootUi` with `cssInjectionMode: "ui"`, use `wxt/storage` for persistent state, and proxy LLM calls through a Hono Cloudflare Worker.'
+        },
+        {
+          id: 'edge-api',
+          shortTitle: 'Edge-First Global API',
+          title: 'Edge-First Global APIs & Media Platforms',
+          category: 'Edge',
+          icon: 'globe',
+          accent: 'cyan',
+          preAiDifficulty: '1–2 Months (SRE)',
+          postAiDifficulty: '1 Day',
+          superpower: '<5ms cold starts across 300+ global PoPs, CPU-time billing, and $0 bandwidth egress.',
+          primaryStack: 'Cloudflare Workers + Hono + D1 / Hyperdrive + R2 + Astro',
+          altStack: 'AWS Lambda + API Gateway + CloudFront + S3',
+          trapStack: 'Region-locked Node server + S3 public bucket (High global ping & $90/TB egress shock)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'Astro 5 + React Islands', role: 'Zero-JS Static + Interactive' },
+            { layer: 'Runtime / API', tech: 'Cloudflare Workers + Hono', role: 'V8 Isolates (CPU-Billed)' },
+            { layer: 'Data & Sync', tech: 'D1 Edge SQLite / Hyperdrive', role: 'Global Reads / PG Pool' },
+            { layer: 'Edge / Deploy', tech: '300+ PoPs + R2 ($0 Egress)', role: 'Instant `wrangler deploy`' },
+            { layer: 'Agentic Guardrails', tech: 'wrangler types + Vitest Pool', role: 'Typed Env Bindings' }
+          ],
+          agenticUnlock: '`wrangler types` auto-generates strict TypeScript interfaces for every D1 database, R2 bucket, KV namespace, and Queue. AI agents physically cannot hallucinate binding names or APIs.',
+          pre2025Bottleneck: 'Multi-region active-active infrastructure with global read replicas and zero-downtime routing required senior SRE teams and $5,000+/mo in cloud spend.',
+          upgradePath: {
+            day1: '100% offline local emulation via `wrangler dev` ($0 cloud spend).',
+            saas: '$5/mo Workers Paid plan comfortably serves 10M+ requests and terabytes of R2 egress.',
+            enterprise: 'Add Hyperdrive for centralized Postgres writes, Smart Placement, and Analytics Engine.'
+          },
+          pros: [
+            'CPU-time billing ignores waiting on LLMs or DBs (up to 10x cheaper than Lambda).',
+            '$0 egress on R2 eliminates bandwidth anxiety for media/AI apps.',
+            'Hono code is portable to Bun, Deno, or Node if you ever move off Workers.'
+          ],
+          cons: [
+            '128MB isolate memory limit prevents heavy in-memory video/ML processing.',
+            'No raw TCP sockets or native C++ addons inside V8 isolates.'
+          ],
+          costSnapshot: { u1k: '$0 / mo (Free Tier)', u100k: '$15 – $55 / mo', u10m: '$320 / mo (Zero Egress)' },
+          ascii: `[Global User] ──<30ms──► [Nearest Edge PoP (Workers + Hono)]
+                              ├──► [D1 Read Replica / Hyperdrive]
+                              └──► [R2 Storage ($0.00/GB Egress)]`,
+          setupId: 'cf-edge',
+          starterPrompt: 'Build a globally distributed edge API using Cloudflare Workers, Hono, D1 (Drizzle ORM), and R2 storage. Configure `wrangler.jsonc`, generate typed bindings with `wrangler types`, and add unit tests using `@cloudflare/vitest-pool-workers`.'
+        },
+        {
+          id: 'business-bridge',
+          shortTitle: 'Legacy Business Bridge',
+          title: 'Plug-and-Play Business Bridge (ERP / CRM / Sheets)',
+          category: 'Business Bridge',
+          icon: 'building',
+          accent: 'emerald',
+          preAiDifficulty: '$150k Consulting',
+          postAiDifficulty: '2–3 Days',
+          superpower: 'One 15MB zero-dependency Go binary wrapping messy ERPs, PDFs & Excel with a live MCP server.',
+          primaryStack: 'Go + Chi + sqlc + SQLite/Litestream + HTMX/React + MCP Server',
+          altStack: 'Bun + Hono + Postgres + Docker Compose',
+          trapStack: 'Fragile Zapier/Make spaghetti chains (Un-auditable, breaks silently, steep per-task fees)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'Embedded HTMX / React', role: 'Ops Portal (//go:embed)' },
+            { layer: 'Runtime / API', tech: 'Go Single Binary (Chi + MCP)', role: 'ERP Sync + AI Tool Server' },
+            { layer: 'Data & Sync', tech: 'SQLite + Litestream / PG', role: 'Audit Log & Local Cache' },
+            { layer: 'Edge / Deploy', tech: '1x $6 VPS / On-Prem VM', role: 'Zero Runtime Dependencies' },
+            { layer: 'Agentic Guardrails', tech: 'sqlc + go vet + -race', role: 'Bulletproof Concurrency' }
+          ],
+          agenticUnlock: 'Go has a tiny spec, one canonical style, and `sqlc` turns raw SQL into 100% type-safe Go code. Frontier coding models write rock-solid Go with near-zero hallucinations and verify concurrency via `go test -race`.',
+          pre2025Bottleneck: 'Bridging legacy SAP/Tally/QuickBooks databases, PDF invoices, and Excel sheets into a unified AI-queryable internal portal cost enterprises 6 figures in custom consulting.',
+          upgradePath: {
+            day1: 'Drop one compiled Go executable onto an existing Windows/Linux office VM or $6 VPS.',
+            saas: 'Expose RBAC-protected Model Context Protocol (MCP) endpoints so Gemini/Claude safely query ERP data.',
+            enterprise: 'Containerize with Prometheus metrics, SAML SSO, and multi-branch Postgres isolation.'
+          },
+          pros: [
+            'Ships as ONE static binary (~15MB) with UI embedded via `//go:embed`.',
+            'Goroutines handle hundreds of parallel ERP/webhook syncs on 32MB RAM.',
+            'Go’s stability guarantee means code built today runs unchanged in 2030.'
+          ],
+          cons: [
+            'Verbose error handling boilerplate (effortless for AI agents to write).',
+            'Calls external LLM/OCR APIs rather than running native PyTorch models.'
+          ],
+          costSnapshot: { u1k: '$5 / mo (1x VPS)', u100k: '$24 / mo (2x HA VPS)', u10m: '$180 / mo (Bare Metal)' },
+          ascii: `[Legacy ERP / Tally / Excel / PDFs]
+                │ Cron / Goroutines
+                ▼
+┌─────────────────────────────────────────┐
+│  Single Go Binary (Chi + sqlc + MCP)    │ ◄── Embedded Web UI
+│  SQLite + Litestream S3/R2 Backup       │ ◄── AI Agents (MCP)
+└─────────────────────────────────────────┘`,
+          setupId: 'go-bridge',
+          starterPrompt: 'Build a single-binary business bridge in Go using go-chi/chi, sqlc with SQLite (WAL + Litestream-ready), structured log/slog logging, an embedded React/HTMX dashboard via //go:embed, and a Model Context Protocol (MCP) server exposing read-only business tools with RBAC audit logging.'
+        },
+        {
+          id: 'native-desktop',
+          shortTitle: 'Native Local-First Desktop',
+          title: 'Native Local-First Desktop Utilities',
+          category: 'Desktop',
+          icon: 'monitor',
+          accent: 'emerald',
+          preAiDifficulty: '2–3 Months',
+          postAiDifficulty: '1–2 Days',
+          superpower: '<10MB native macOS/Win/Linux binary with Rust core speed and React/Tailwind UI.',
+          primaryStack: 'Tauri v2 + Rust Core + React 19 + Tailwind + Local SQLite',
+          altStack: 'Electron + Node.js + React (180MB installer, 300MB RAM)',
+          trapStack: 'Writing 3 separate native codebases (Swift + C# + GTK) for a solo/small team',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'React 19 (OS WebView)', role: 'Crisp Native-Feeling UI' },
+            { layer: 'Runtime / API', tech: 'Tauri v2 IPC + Rust Core', role: 'FS, Tray, Shortcuts, AI' },
+            { layer: 'Data & Sync', tech: 'Local SQLite (sqlx/rusqlite)', role: 'Encrypted Offline Vault' },
+            { layer: 'Edge / Deploy', tech: 'Signed OTA via Cloudflare R2', role: '<10MB Auto-Updater' },
+            { layer: 'Agentic Guardrails', tech: 'cargo clippy + tsc --noEmit', role: 'Dual-Layer Type Safety' }
+          ],
+          agenticUnlock: 'Tauri v2 cleanly splits UI (React/Tailwind) from OS systems work (`#[tauri::command]` in Rust). Agents iterate visually in Vite while Cargo verifies file I/O, threading, and encryption at compile time.',
+          pre2025Bottleneck: 'Shipping a tiny, battery-friendly menu-bar utility across macOS, Windows, and Linux meant either learning Swift + C# or shipping a bloated 180MB Electron bundle.',
+          upgradePath: {
+            day1: '`bun tauri dev` hot-reloading desktop app with local SQLite and global hotkeys.',
+            saas: 'GitHub Actions matrix builds signed .dmg/.msi/.AppImage hosted on R2 + Stripe license keys.',
+            enterprise: 'Add optional E2E encrypted cloud sync (Turso/CRDTs) and Tauri v2 iOS/Android targets.'
+          },
+          pros: [
+            'Installer under 10MB and idle RAM under 40MB (vs 300MB+ Electron).',
+            'Rust core unlocks blazing local indexing, Whisper, and local LLM runners.',
+            'Strict Tauri v2 capabilities ACL locks down OS permissions.'
+          ],
+          cons: [
+            'Minor WebView differences between macOS WebKit and Windows WebView2.',
+            'Requires Apple notarization & Windows signing certs for public trust.'
+          ],
+          costSnapshot: { u1k: '$0 / mo', u100k: '$5 / mo (R2 OTA Updates)', u10m: '$45 / mo (R2 + License API)' },
+          ascii: `┌─────────────── Tauri v2 (<10MB Binary) ───────────────┐
+│  [React 19 + Tailwind (OS WebView)]                   │
+│                 ▲  Typed IPC invoke()                 │
+│                 ▼                                     │
+│  [Rust Core: SQLite + FS + Tray + Local AI + Crypto]  │
+└───────────────────────────────────────────────────────┘`,
+          setupId: 'tauri-desktop',
+          starterPrompt: 'Scaffold a cross-platform native desktop app using Tauri v2, Rust backend commands, SQLite persistence in app_data_dir, and a React 19 + Tailwind frontend. Keep all heavy I/O async in Rust, configure strict Tauri v2 capabilities, and verify with both `tsc --noEmit` and `cargo clippy -- -D warnings`.'
+        },
+        {
+          id: 'ai-pipeline',
+          shortTitle: 'AI Agent & Data Pipeline',
+          title: 'AI Agent Orchestration & Data Pipelines',
+          category: 'SaaS',
+          icon: 'bot',
+          accent: 'indigo',
+          preAiDifficulty: 'Research Team',
+          postAiDifficulty: '2–3 Days',
+          superpower: 'Hybrid architecture: Python (uv/PydanticAI) for AI brain + Go/Bun gateway for 100k SSE streams.',
+          primaryStack: 'Python (uv + FastAPI + PydanticAI) + Go/Bun Streaming Gateway + Postgres pgvector',
+          altStack: 'Pure TypeScript (Bun + Vercel AI SDK + Mastra)',
+          trapStack: 'Exposing raw single-worker Python directly to 50k slow LLM SSE streams (OOM crash)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'React + Generative UI Stream', role: 'Live Tool-Calls & Citations' },
+            { layer: 'Runtime / API', tech: 'Go/Bun Proxy + FastAPI Brain', role: 'SSE Mux + Agent Graph' },
+            { layer: 'Data & Sync', tech: 'Postgres 18 + pgvector', role: 'Hybrid BM25 + Vector RAG' },
+            { layer: 'Edge / Deploy', tech: 'Temporal / CF Workflows', role: 'Durable Multi-Min Runs' },
+            { layer: 'Agentic Guardrails', tech: 'Pydantic v2 + Pyright + Evals', role: 'Structured Output Checks' }
+          ],
+          agenticUnlock: 'Pydantic v2 schemas + `uv` (100x faster Python packaging) give coding agents crisp contracts for structured LLM outputs, while durable workflows guarantee long multi-step agents recover from API timeouts.',
+          pre2025Bottleneck: 'Building resilient multi-agent workflows with hybrid search, sandboxed tool execution, eval harnesses, and streaming UI took months of distributed systems and ML engineering.',
+          upgradePath: {
+            day1: 'Single `uv` FastAPI service (or Bun + AI SDK) with Postgres pgvector and SSE streaming.',
+            saas: 'Add durable execution (Temporal / Cloudflare Workflows), semantic caching, and automated evals.',
+            enterprise: 'Front with a Go/Rust streaming gateway, Wasmtime/Firecracker tool sandboxes, and vLLM routing.'
+          },
+          pros: [
+            'Full access to Python’s unmatched AI, parsing (Docling), and eval ecosystem.',
+            'Postgres `pgvector` eliminates extra vector DB infra under 10M vectors.',
+            'Dedicated Go/Bun proxy keeps idle SSE connections dirt-cheap.'
+          ],
+          cons: [
+            'Two-language ops overhead if you split Python + Go too early.',
+            'LLM non-determinism requires automated evals, not just unit tests.'
+          ],
+          costSnapshot: { u1k: '$20 / mo (Infra)', u100k: '$220 / mo (Infra)', u10m: '$1,800 / mo (Infra excl. tokens)' },
+          ascii: `[Client] ◄──SSE──► [Go/Bun Gateway (Auth/RateLimit)]
+                            │ gRPC / HTTP
+                            ▼
+             [Python (uv + FastAPI + PydanticAI)]
+                  ├──► [Postgres 18 + pgvector]
+                  └──► [Wasmtime / Sandbox Tools]`,
+          setupId: 'rust-systems',
+          starterPrompt: 'Architect a production AI agent platform with a Python (uv, FastAPI, PydanticAI) orchestration service, Postgres 18 with pgvector for hybrid search, and a high-concurrency streaming gateway. Include strict Pyright typing, structured Pydantic tool schemas, and an automated pytest eval harness.'
+        },
+        {
+          id: 'local-collab',
+          shortTitle: 'Local-First Collaborative App',
+          title: 'Local-First Collaborative App (Linear / Figma Feel)',
+          category: 'Realtime',
+          icon: 'users',
+          accent: 'amber',
+          preAiDifficulty: '6+ Months (PhD)',
+          postAiDifficulty: '3–4 Days',
+          superpower: '0ms optimistic UI mutations via IndexedDB + CRDTs (Yjs / Zero / ElectricSQL) synced at the Edge.',
+          primaryStack: 'React + Yjs / ElectricSQL (or Zero) + IndexedDB + Cloudflare Durable Objects + Postgres',
+          altStack: 'Supabase Realtime + Optimistic TanStack Query',
+          trapStack: 'Rolling custom WebSocket diff/merge conflict resolution from scratch (Data corruption)',
+          pipeline: [
+            { layer: 'Client / UI', tech: 'React + Local Store (0ms UI)', role: 'Instant Offline Mutations' },
+            { layer: 'Runtime / API', tech: 'Sync Engine (Yjs / Electric)', role: 'CRDT Delta Replication' },
+            { layer: 'Data & Sync', tech: 'IndexedDB ↔ Postgres 18', role: 'Offline-First Bi-Directional' },
+            { layer: 'Edge / Deploy', tech: 'Durable Objects Relay', role: 'Low-Latency Presence & Sync' },
+            { layer: 'Agentic Guardrails', tech: 'Strict Mutation Schema + Tests', role: 'Deterministic Merge Proofs' }
+          ],
+          agenticUnlock: 'Modern sync engines (Yjs, ElectricSQL, Rocicorp Zero) encapsulate the brutal distributed systems math. Coding agents simply define typed client mutators and Postgres schemas to deliver Linear-grade instant UX.',
+          pre2025Bottleneck: 'Achieving 0ms local clicks, offline editing, and conflict-free multiplayer sync like Linear or Figma required a dedicated sync-engine team of 5+ senior engineers.',
+          upgradePath: {
+            day1: 'Local-only React + IndexedDB / Yjs document working 100% offline in the browser.',
+            saas: 'Attach a Cloudflare Durable Object sync relay + Postgres persistence for instant team collaboration.',
+            enterprise: 'Add granular row-level sync permissions, encrypted CRDT snapshots on R2, and audit history.'
+          },
+          pros: [
+            'Zero loading spinners: every click mutates local memory in <1ms.',
+            'Works seamlessly on airplanes/spotty Wi-Fi and auto-merges on reconnect.',
+            'Multiplayer cursors and live presence come nearly for free.'
+          ],
+          cons: [
+            'Schema migrations must remain backward-compatible with older offline clients.',
+            'Large datasets require careful partial sync / query-based replication.'
+          ],
+          costSnapshot: { u1k: '$5 / mo', u100k: '$75 – $190 / mo', u10m: '$1,250 / mo (Edge Sync)' },
+          ascii: `[User A (0ms UI + IndexedDB)] ◄──CRDT Deltas──► [Edge Sync Relay]
+                                                        │
+[User B (0ms UI + IndexedDB)] ◄──CRDT Deltas──► [Postgres 18 Source]`,
+          setupId: 'cf-edge',
+          starterPrompt: 'Build a local-first collaborative workspace app using React, TypeScript, Yjs (with y-indexeddb for offline persistence), and a Cloudflare Durable Object WebSocket relay with hibernation enabled. Ensure 0ms optimistic mutations, presence cursors, and automated conflict-merge tests.'
+        }
+      ];
+
+      /* --------------------------------------------------------------------
+         3. DECISION ENGINE SCALES & PRIORITIES
+      -------------------------------------------------------------------- */
+      const SCALES = [
+        { id: 'solo', label: 'Solo / Local', sub: '<1k req/mo' },
+        { id: 'indie', label: 'Indie Launch', sub: '100k req/mo' },
+        { id: 'growth', label: 'Growth SaaS', sub: '10M req/mo' },
+        { id: 'enterprise', label: 'Enterprise', sub: '500M+ req/mo' }
+      ];
+
+      const PRIORITIES = [
+        { id: 'ship2h', label: 'Ship in 2 Hours', icon: 'zap' },
+        { id: 'zerocost', label: 'Zero-Cost / Minimal Ops', icon: 'dollar' },
+        { id: 'maxperf', label: 'Max Perf & Compiler Guardrails', icon: 'shield' },
+        { id: 'offline', label: 'Offline / Local-First', icon: 'monitor' },
+        { id: 'upgrade', label: 'Seamless Solo-to-SaaS Upgrade', icon: 'layers' }
+      ];
+
+      /* --------------------------------------------------------------------
+         4. RUNTIME ARENA DATA (6 RUNTIMES)
+      -------------------------------------------------------------------- */
+      const RUNTIMES = [
+        {
+          id: 'rust',
+          name: 'Rust (Axum / Tokio / Wasm)',
+          tagline: 'Zero-GC Deterministic Systems King',
+          color: 'var(--amber)',
+          badgeClass: 'badge-amber',
+          coldStartMs: 3,
+          coldStart: '2 – 5 ms',
+          memMb: 7,
+          memory: '4 – 12 MB',
+          verifierScore: 99,
+          velocityScore: 76,
+          leverageScore: 86,
+          bestFor: 'Proxies, WASM sandboxes, game engines, Tauri desktop core, ultra-low p99 latency.',
+          avoidWhen: 'Rapidly pivoting throwaway CRUD prototypes where compile times slow UI iteration.'
+        },
+        {
+          id: 'go',
+          name: 'Go (net/http / Chi / Single Binary)',
+          tagline: 'Bulletproof Enterprise Workhorse',
+          color: 'var(--emerald)',
+          badgeClass: 'badge-emerald',
+          coldStartMs: 10,
+          coldStart: '8 – 15 ms',
+          memMb: 18,
+          memory: '12 – 25 MB',
+          verifierScore: 95,
+          velocityScore: 88,
+          leverageScore: 93,
+          bestFor: 'Business ERP/CRM bridges, MCP servers, microservices, high-concurrency SSE gateways.',
+          avoidWhen: 'You need shared frontend/backend UI types or native PyTorch/ML libraries.'
+        },
+        {
+          id: 'bun',
+          name: 'Bun + TypeScript (Hono / Elysia)',
+          tagline: 'Unified Full-Stack Velocity Monster',
+          color: 'var(--cyan)',
+          badgeClass: 'badge-cyan',
+          coldStartMs: 15,
+          coldStart: '12 – 25 ms',
+          memMb: 48,
+          memory: '35 – 70 MB',
+          verifierScore: 91,
+          velocityScore: 98,
+          leverageScore: 97,
+          bestFor: 'Solo-to-SaaS monorepos, local tools (bun:sqlite), shared Zod/RPC web platforms.',
+          avoidWhen: 'Heavy multi-threaded CPU number crunching or sub-10MB container footprints.'
+        },
+        {
+          id: 'cf',
+          name: 'Cloudflare Workers (V8 + DO)',
+          tagline: 'Zero Cold-Start Global Edge Isolates',
+          color: 'var(--indigo)',
+          badgeClass: 'badge-indigo',
+          coldStartMs: 2,
+          coldStart: '< 5 ms',
+          memMb: 12,
+          memory: '8 – 16 MB (128MB cap)',
+          verifierScore: 90,
+          velocityScore: 92,
+          leverageScore: 95,
+          bestFor: 'Global APIs, I/O-heavy LLM proxies, $0-egress media apps, hibernatable WebSockets.',
+          avoidWhen: 'In-memory video encoding, native C++ bindings, or >128MB RAM workloads.'
+        },
+        {
+          id: 'python',
+          name: 'Python (uv + FastAPI + Pydantic v2)',
+          tagline: 'AI Orchestration & Data Science King',
+          color: 'var(--rose)',
+          badgeClass: 'badge-rose',
+          coldStartMs: 320,
+          coldStart: '250 – 600 ms',
+          memMb: 185,
+          memory: '140 – 300 MB',
+          verifierScore: 76,
+          velocityScore: 94,
+          leverageScore: 80,
+          bestFor: 'Agent graphs (LangGraph/PydanticAI), eval harnesses, PDF/data pipelines, ML inference.',
+          avoidWhen: 'High-concurrency raw API gateways or ultra-low-cost edge serving.'
+        },
+        {
+          id: 'zig',
+          name: 'Zig / WebAssembly (Compute Kernels)',
+          tagline: 'Surgical Zero-Overhead Compute Modules',
+          color: 'var(--amber)',
+          badgeClass: 'badge-amber',
+          coldStartMs: 1,
+          coldStart: '< 2 ms',
+          memMb: 4,
+          memory: '1 – 6 MB',
+          verifierScore: 94,
+          velocityScore: 62,
+          leverageScore: 72,
+          bestFor: 'Browser/Edge WASM compute kernels (image/audio/physics), embedded CLI parsers.',
+          avoidWhen: 'Standard web APIs, SaaS business logic, or database-heavy CRUD backends.'
+        }
+      ];
+
+      /* --------------------------------------------------------------------
+         5. COST PRESETS
+      -------------------------------------------------------------------- */
+      const COST_PRESETS = [
+        { id: 'indie', label: 'Indie SaaS (500K req)', reqsIdx: 12, wall: 120, cpu: 20, egress: 100, ws: 200 },
+        { id: 'ai-stream', label: 'AI Streaming Agent (10M req, 95% I/O wait)', reqsIdx: 42, wall: 2800, cpu: 5, egress: 800, ws: 4000 },
+        { id: 'viral-game', label: 'Viral Realtime Game (50K WebSockets)', reqsIdx: 62, wall: 80, cpu: 35, egress: 2500, ws: 50000 },
+        { id: 'ent-b2b', label: 'Enterprise B2B (100M req, 10TB Egress)', reqsIdx: 76, wall: 240, cpu: 30, egress: 10000, ws: 12000 }
+      ];
+
+      /* --------------------------------------------------------------------
+         6. 7 PRODUCTION-GRADE AGENT SETUP FILES
+      -------------------------------------------------------------------- */
+      const SETUP_FILES = [
+        {
+          id: 'bun-saas',
+          name: 'Bun + Hono + Drizzle + React',
+          subtitle: 'Zero-to-One Multi-Tenant SaaS',
+          accent: 'indigo',
+          content: `# AGENTS.md — Bun + Hono + Drizzle + React (2026 SaaS Standard)
+
+## 1. Architecture & Stack Contract
+- **Runtime**: Bun 1.2+ (native \`bun:sqlite\` for local dev, \`postgres\` driver for Postgres 18).
+- **API**: Hono + \`@hono/zod-validator\` + Hono RPC (\`export type AppType = typeof app\`).
+- **Database**: Drizzle ORM with strict schema-first migrations & Row-Level Security (RLS).
+- **Auth**: BetterAuth hosted directly in Postgres (zero per-MAU vendor lock-in).
+- **Frontend**: React 19 + Tailwind CSS + TanStack Query consuming typed Hono RPC client.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── apps/
+│   ├── api/                 # Hono routes, Drizzle schema, BetterAuth, background jobs
+│   └── web/                 # React 19 SPA/SSR consuming hc<AppType>
+├── packages/
+│   └── shared/              # Shared Zod validators & domain enums
+└── package.json             # Bun workspaces root
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **ALWAYS** validate every body, query, and param with Zod before DB access.
+- **ALWAYS** scope every tenant query by \`organizationId\` / \`userId\`.
+- **FORBIDDEN**: Never use \`any\`, \`@ts-ignore\`, or unchecked type casts (\`as unknown as T\`).
+- **FORBIDDEN**: Never install \`axios\`, \`lodash\`, or \`moment\` — use native \`fetch\` & ES2025.
+- **FORBIDDEN**: Never interpolate raw variables into SQL strings.
+
+## 4. Mandatory Verification Loop (Run After EVERY Change)
+\`\`\`bash
+bunx tsc --noEmit                  # 1. Cross-workspace strict typecheck
+bunx biome check --write .         # 2. Sub-second lint & format
+bun run db:check                   # 3. Verify Drizzle schema/migration parity
+bun test                           # 4. Run unit + Hono integration tests
+\`\`\`
+
+## 5. Deployment Guardrails
+- Validate all required env vars (\`DATABASE_URL\`, \`R2_BUCKET\`, \`AUTH_SECRET\`) via Zod at boot.
+- Expose \`GET /health\` verifying live Postgres connectivity before returning HTTP 200.`
+        },
+        {
+          id: 'rust-systems',
+          name: 'Rust + Axum + SQLx + Strict Workspace',
+          subtitle: 'High-Perf Systems, Proxies & Sandboxes',
+          accent: 'amber',
+          content: `# AGENTS.md — Rust + Axum + Tokio + SQLx (Zero-GC High-Perf Stack)
+
+## 1. Architecture & Stack Contract
+- **Web / Async**: Axum 0.8 + Tokio multi-threaded runtime + Tower middleware.
+- **Database**: SQLx with compile-time verified queries (\`sqlx::query_as!\`) on PostgreSQL.
+- **Sandboxing**: Wasmtime with fuel & epoch interruption for untrusted code execution.
+- **Observability**: \`tracing\` structured JSON logs + OpenTelemetry spans.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── crates/
+│   ├── api/                 # Axum router, thin handlers, AppError -> IntoResponse
+│   ├── domain/              # Pure business logic (zero HTTP/DB coupling)
+│   └── infra/               # SQLx repositories, Wasmtime runner, external clients
+├── migrations/              # Forward-only SQL migrations
+└── Cargo.toml               # Workspace with release LTO="thin", strip=true
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **FORBIDDEN**: Never use \`.unwrap()\` or \`.expect()\` in production request paths. Propagate via \`?\` and \`thiserror\`.
+- **FORBIDDEN**: Never hold a \`std::sync::MutexGuard\` across an \`.await\` point.
+- **FORBIDDEN**: Never block Tokio worker threads with synchronous I/O — use \`spawn_blocking\`.
+- **FORBIDDEN**: Zero \`unsafe {}\` blocks without explicit \`// SAFETY:\` invariants.
+- **ALWAYS** wire graceful shutdown for \`SIGINT\` and \`SIGTERM\`.
+
+## 4. Mandatory Verification Loop (Compiler-as-Verifier)
+\`\`\`bash
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo audit
+\`\`\`
+
+## 5. Deployment Guardrails
+- Run \`cargo sqlx prepare --workspace\` before Docker builds so CI compiles offline.
+- Ship statically linked musl binary in distroless/scratch container (<15MB image).`
+        },
+        {
+          id: 'go-bridge',
+          name: 'Go + Chi + SQLite/Litestream',
+          subtitle: 'Single-Binary Business Bridge & MCP Server',
+          accent: 'emerald',
+          content: `# AGENTS.md — Go + Chi + sqlc + SQLite/Litestream (Single-Binary Stack)
+
+## 1. Architecture & Stack Contract
+- **HTTP Router**: \`go-chi/chi/v5\` with standard \`net/http\` handlers.
+- **Database**: SQLite (WAL mode + Litestream R2 replication) or Postgres via \`sqlc\` type-safe codegen.
+- **AI Interface**: Built-in Model Context Protocol (MCP) server exposing RBAC-audited business tools.
+- **Frontend**: Embedded static UI via \`//go:embed\` (zero separate frontend server).
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── cmd/server/main.go       # Entrypoint, config, graceful http.Server shutdown
+├── internal/
+│   ├── api/                 # Chi routes, auth middleware, SSE streams
+│   ├── mcp/                 # MCP tool schemas & read/write RBAC guards
+│   ├── db/                  # sqlc-generated Go (DO NOT EDIT BY HAND)
+│   └── sync/                # Managed ERP/CRM/Sheet background workers
+├── sql/                     # Schema migrations + raw .sql queries for sqlc
+└── sqlc.yaml
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **ALWAYS** pass \`context.Context\` as arg #1 to every DB, HTTP, and sync function.
+- **ALWAYS** wrap errors with context: \`fmt.Errorf("erp sync %s: %w", id, err)\`.
+- **FORBIDDEN**: Never spawn untracked goroutines — use \`errgroup.Group\` with cancellation.
+- **FORBIDDEN**: Never edit \`internal/db/\` manually — edit \`sql/queries/*.sql\` and run \`sqlc generate\`.
+- **ALWAYS** set explicit timeouts on every \`http.Client\` and \`http.Server\`.
+
+## 4. Mandatory Verification Loop
+\`\`\`bash
+sqlc generate                      # 1. Regenerate type-safe DB code
+go vet ./...                       # 2. Static analyzer
+go test -race -count=1 ./...       # 3. Tests with race detector enabled
+golangci-lint run                  # 4. Enforce Go idioms & error checks
+\`\`\`
+
+## 5. Deployment Guardrails
+- Build static binary: \`CGO_ENABLED=0 go build -ldflags="-s -w" -o bridge ./cmd/server\`.
+- Verify binary boots with <25MB idle RAM and streams Litestream WAL snapshots to R2.`
+        },
+        {
+          id: 'cf-edge',
+          name: 'Cloudflare Workers + Durable Objects + D1',
+          subtitle: 'Edge-First Global API & Realtime Actors',
+          accent: 'cyan',
+          content: `# AGENTS.md — Cloudflare Workers + Hono + Durable Objects + D1/R2
+
+## 1. Architecture & Stack Contract
+- **Compute**: Cloudflare Workers (V8 Isolates) + Hono router.
+- **Stateful Realtime**: Durable Objects with SQLite storage + WebSocket Hibernation API.
+- **Data & Storage**: D1 (Edge SQLite) or Hyperdrive (pooled Postgres) + R2 ($0 egress).
+- **Config**: \`wrangler.jsonc\` as single source of truth for all bindings.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── src/
+│   ├── index.ts             # Hono app + Durable Object class exports
+│   ├── routes/              # Stateless global edge routes
+│   ├── objects/             # Durable Object actors (RoomActor.ts, SyncActor.ts)
+│   └── db/                  # Drizzle D1 schema & typed queries
+├── migrations/              # D1 SQL migrations
+├── worker-configuration.d.ts # Auto-generated by \`wrangler types\`
+└── wrangler.jsonc
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **ALWAYS** use WebSocket Hibernation (\`ctx.acceptWebSocket(ws)\` + \`webSocketMessage\`) so idle WS cost $0.
+- **ALWAYS** run \`npx wrangler types\` immediately after editing \`wrangler.jsonc\`.
+- **FORBIDDEN**: Never store per-request mutable state in global module variables.
+- **FORBIDDEN**: Never import Node native C++ modules (\`fs\`, \`bcrypt\`) — use Web Crypto (\`crypto.subtle\`).
+- **ALWAYS** wrap multi-key DO writes in \`ctx.storage.transactionSync\`.
+
+## 4. Mandatory Verification Loop
+\`\`\`bash
+npx wrangler types                 # 1. Sync typed Env bindings
+npx tsc --noEmit                   # 2. Strict TypeScript check
+npx vitest run                     # 3. Run @cloudflare/vitest-pool-workers tests
+npx wrangler deploy --dry-run      # 4. Verify bundle size (<10MB)
+\`\`\`
+
+## 5. Deployment Guardrails
+- Apply remote migrations via \`npx wrangler d1 migrations apply DB --remote\`.
+- Lock down R2 CORS & presigned URL TTLs before exposing public uploads.`
+        },
+        {
+          id: 'wxt-ext',
+          name: 'WXT + TypeScript + React',
+          subtitle: 'Cross-Browser MV3 AI Extension',
+          accent: 'cyan',
+          content: `# AGENTS.md — WXT + Vite + React + Shadow DOM (Manifest V3 Standard)
+
+## 1. Architecture & Stack Contract
+- **Framework**: WXT (active Vite-native successor to maintenance-mode Plasmo).
+- **UI Isolation**: Mount all in-page overlays via \`createShadowRootUi\` with \`cssInjectionMode: 'ui'\`.
+- **Storage**: Typed \`wxt/storage\` items (never untyped \`chrome.storage.local\`).
+- **Backend**: Cloudflare Workers proxy for auth, billing, and secret LLM API keys.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── entrypoints/
+│   ├── background.ts        # Stateless MV3 Service Worker (wakes on events)
+│   ├── content.ts           # Shadow DOM overlay injector + MutationObserver
+│   ├── popup/               # Toolbar popup React UI
+│   └── sidepanel/           # Chrome/Edge Side Panel AI Copilot
+├── utils/
+│   ├── messaging.ts         # Type-safe message bus (@webext-core/messaging)
+│   └── storage.ts           # Typed wxt/storage definitions
+└── wxt.config.ts
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **FORBIDDEN**: Never store persistent state in \`background.ts\` memory — MV3 workers sleep after 30s.
+- **FORBIDDEN**: Never mount React directly into \`document.body\` — host CSS will collide. Always use Shadow DOM.
+- **FORBIDDEN**: Never bundle secret API keys inside extension JS — proxy via Edge Worker.
+- **ALWAYS** request least-privilege \`permissions\` & \`host_permissions\` for fast store approval.
+
+## 4. Mandatory Verification Loop
+\`\`\`bash
+npx wxt prepare                                # 1. Regenerate auto-imports & types
+npx tsc --noEmit                               # 2. Strict TypeScript check
+bun test                                       # 3. Unit tests for DOM parsers
+npx wxt build && npx wxt build -b firefox      # 4. Verify Chrome + Firefox MV3 builds
+\`\`\`
+
+## 5. Deployment Guardrails
+- Package store zips via \`npx wxt zip\` and \`npx wxt zip -b firefox\`.
+- Smoke-test overlays on strict-CSP hosts (GitHub, Gmail, Linear) for zero console errors.`
+        },
+        {
+          id: 'tauri-desktop',
+          name: 'Tauri v2 + Rust + Vite/React',
+          subtitle: 'Native Local-First Desktop (<10MB)',
+          accent: 'emerald',
+          content: `# AGENTS.md — Tauri v2 + Rust Core + React 19 (Native Desktop Standard)
+
+## 1. Architecture & Stack Contract
+- **Native Core**: Rust (\`src-tauri/\`) for FS, SQLite, OS tray, global shortcuts, crypto, local AI.
+- **Frontend**: React 19 + Tailwind CSS rendered in OS native WebView (<10MB installer).
+- **IPC Bridge**: Strongly typed \`#[tauri::command]\` handlers serialized via \`serde\`.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── src/                     # React + TypeScript UI
+│   ├── lib/tauri.ts         # Typed wrappers around invoke() & listen()
+│   └── components/          # Desktop UI + Cmd+K command palette
+├── src-tauri/
+│   ├── src/
+│   │   ├── lib.rs           # Tauri builder, plugins & command registration
+│   │   ├── commands/        # Async #[tauri::command] handlers -> Result<T, String>
+│   │   └── db.rs            # Local SQLite stored in app.path().app_data_dir()
+│   ├── capabilities/        # Least-privilege Tauri v2 ACL JSON files
+│   └── tauri.conf.json
+└── package.json
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **ALWAYS** declare heavy \`#[tauri::command]\` functions \`async\` so the UI thread never freezes.
+- **ALWAYS** resolve OS paths via \`app.path().app_data_dir()\` — never hardcode \`/Users/...\`.
+- **FORBIDDEN**: Never use \`alert()\` or \`confirm()\` — use custom modals or \`plugin-dialog\`.
+- **ALWAYS** restrict FS/shell scope tightly inside \`src-tauri/capabilities/default.json\`.
+
+## 4. Mandatory Verification Loop
+\`\`\`bash
+bunx tsc --noEmit
+cargo check --manifest-path src-tauri/Cargo.toml
+cargo clippy --manifest-path src-tauri/Cargo.toml -- -D warnings
+cargo test --manifest-path src-tauri/Cargo.toml
+\`\`\`
+
+## 5. Deployment Guardrails
+- Point \`tauri-plugin-updater\` to a signed JSON manifest hosted on Cloudflare R2 ($0 egress).
+- Verify layout & dark mode across both macOS WebKit and Windows WebView2.`
+        },
+        {
+          id: 'realtime-game',
+          name: 'SpacetimeDB / Colyseus + Canvas/WebGPU',
+          subtitle: '60Hz Realtime Multiplayer Games',
+          accent: 'amber',
+          content: `# AGENTS.md — Realtime Multiplayer Game Stack (SpacetimeDB / Colyseus + WebGPU)
+
+## 1. Architecture & Stack Contract
+- **Authoritative Server**: SpacetimeDB (Rust/C# reducers) OR Cloudflare Durable Objects / Colyseus room actors.
+- **Client Renderer**: HTML5 Canvas 2D / WebGPU with fixed-timestep accumulator & interpolation.
+- **Networking**: Binary delta compression, client-side prediction, and server reconciliation.
+
+## 2. Canonical Directory Structure
+\`\`\`text
+├── server/
+│   ├── src/lib.rs           # Authoritative tables, reducers, 60Hz tick scheduler
+│   └── src/physics.rs       # Deterministic fixed-point / fixed-dt physics
+├── client/
+│   ├── src/engine/          # Fixed-timestep loop, input buffer, snapshot interpolation
+│   ├── src/render/          # Canvas/WebGPU renderer (decoupled from React HUD!)
+│   └── src/hud/             # Lightweight React overlay for lobby, chat & scoreboard
+└── shared/                  # Generated binary protocol bindings
+\`\`\`
+
+## 3. Strict Engineering Rules & Forbidden Anti-Patterns
+- **FORBIDDEN**: Never trust client-reported positions, damage, or inventory — validate all inputs server-side.
+- **FORBIDDEN**: Never drive 60fps canvas rendering through React \`useState\` — keep game state in mutable refs/typed arrays.
+- **ALWAYS** decouple network tick rate (20–30Hz) from visual render rate (60–144Hz) via snapshot interpolation.
+- **ALWAYS** bound entity counts, room sizes, and message payload bytes to prevent DoS spikes.
+
+## 4. Mandatory Verification Loop
+\`\`\`bash
+cargo clippy --manifest-path server/Cargo.toml -- -D warnings
+cargo test --manifest-path server/Cargo.toml   # Deterministic simulation tests
+bunx tsc --noEmit                              # Client + generated bindings check
+bun test                                       # Prediction/reconciliation tests
+\`\`\`
+
+## 5. Deployment Guardrails
+- Stress-test 100+ simulated bot clients with artificial 120ms jitter & 2% packet loss before launch.
+- Persist match results & replays asynchronously to Postgres / R2 outside the hot tick loop.`
+        }
+      ];
+
+      /* --------------------------------------------------------------------
+         7. APPLICATION STATE
+      -------------------------------------------------------------------- */
+      const state = {
+        activeTab: 'decision', // decision | bible | arena | cost | setup
+        // Decision Engine
+        archetype: 'multi-saas',
+        scale: 'indie',
+        priority: 'ship2h',
+        // Use-Case Bible
+        bibleCategory: 'All',
+        bibleSearch: '',
+        drawerBlueprintId: null,
+        // Runtime Arena
+        arenaSortKey: 'verifierScore',
+        arenaSortDir: 'desc',
+        loopMode: 'strict', // strict | dynamic
+        loopStep: 0,
+        loopTimer: null,
+        // Cost Lab
+        costReqsIdx: 42, // 0..100 mapped logarithmically from 100K to 500M
+        costWallMs: 120,
+        costCpuPct: 20,
+        costEgressGb: 500,
+        costWs: 1000,
+        // Setup Files
+        setupId: 'bun-saas',
+        setupFormat: 'AGENTS.md', // AGENTS.md | .cursorrules | GEMINI.md
+        // Command Palette
+        cmdOpen: false,
+        cmdQuery: '',
+        cmdActiveIdx: 0
+      };
+
+      /* --------------------------------------------------------------------
+         8. UTILITIES (CLIPBOARD, TOAST, LOG SCALE, SYNTAX HIGHLIGHT)
+      -------------------------------------------------------------------- */
+      let toastTimeout = null;
+      function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.innerHTML = `<span style="color:var(--emerald);display:inline-flex;">${ICONS.checkCircle(16)}</span><span>${escapeHtml(msg)}</span>`;
+        el.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => el.classList.remove('show'), 2600);
+      }
+
+      function copyText(text, successMsg = 'Copied to clipboard') {
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(
+            () => showToast(successMsg),
+            () => fallbackCopy(text, successMsg)
+          );
+        } else {
+          fallbackCopy(text, successMsg);
+        }
+      }
+
+      function fallbackCopy(text, successMsg) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast(successMsg);
+        } catch (e) {
+          showToast('Copy failed — please select manually');
+        }
+        document.body.removeChild(ta);
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      // Logarithmic slider: 0 -> 100,000 reqs | 100 -> 500,000,000 reqs
+      function sliderToReqs(idx) {
+        const minLog = Math.log10(100_000);
+        const maxLog = Math.log10(500_000_000);
+        const raw = Math.pow(10, minLog + (idx / 100) * (maxLog - minLog));
+        if (raw < 1_000_000) return Math.round(raw / 50_000) * 50_000;
+        if (raw < 10_000_000) return Math.round(raw / 250_000) * 250_000;
+        if (raw < 100_000_000) return Math.round(raw / 1_000_000) * 1_000_000;
+        return Math.round(raw / 5_000_000) * 5_000_000;
+      }
+
+      function formatReqs(n) {
+        if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+        return `${Math.round(n / 1000)}K`;
+      }
+
+      function formatGb(gb) {
+        return gb >= 1000 ? `${(gb / 1000).toFixed(1)} TB` : `${gb} GB`;
+      }
+
+      function highlightMarkdown(raw) {
+        return escapeHtml(raw)
+          .split('\n')
+          .map((line) => {
+            if (line.startsWith('# ')) return `<span class="syn-h1">${line}</span>`;
+            if (line.startsWith('## ')) return `<span class="syn-h2">${line}</span>`;
+            if (line.includes('FORBIDDEN')) return line.replace(/\*\*FORBIDDEN\*\*/g, '<span class="syn-warn">**FORBIDDEN**</span>');
+            if (line.trim().startsWith('#')) return `<span class="syn-comment">${line}</span>`;
+            if (line.startsWith('- ')) {
+              return `<span class="syn-bullet">- </span>` + line.slice(2).replace(/`([^`]+)`/g, '<span class="syn-code">`$1`</span>');
+            }
+            return line.replace(/`([^`]+)`/g, '<span class="syn-code">`$1`</span>');
+          })
+          .join('\n');
+      }
+
+      /* --------------------------------------------------------------------
+         9. HEADER NAVIGATION RENDERER
+      -------------------------------------------------------------------- */
+      const TABS = [
+        { id: 'decision', label: 'Decision Engine', icon: 'sliders', key: '1' },
+        { id: 'bible', label: 'Use-Case Bible', icon: 'layers', key: '2' },
+        { id: 'arena', label: 'Runtime Arena', icon: 'cpu', key: '3' },
+        { id: 'cost', label: 'Cost-at-Scale Lab', icon: 'dollar', key: '4' },
+        { id: 'setup', label: 'Agent Setup Files', icon: 'fileCode', key: '5' }
+      ];
+
+      function renderNav() {
+        document.getElementById('brand-logo').innerHTML = ICONS.cpu(20);
+        document.getElementById('cmd-search-icon').innerHTML = ICONS.search(14);
+        document.getElementById('cmd-modal-icon').innerHTML = ICONS.search(18);
+
+        const nav = document.getElementById('main-nav');
+        nav.innerHTML = TABS.map(
+          (t) => `
+          <button class="nav-tab ${state.activeTab === t.id ? 'active' : ''}" data-tab="${t.id}">
+            ${ICONS[t.icon](14)}
+            <span>${t.label}</span>
+            <span class="kbd">${t.key}</span>
+          </button>
+        `
+        ).join('');
+
+        nav.querySelectorAll('.nav-tab').forEach((btn) => {
+          btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+      }
+
+      function switchTab(tabId) {
+        state.activeTab = tabId;
+        document.querySelectorAll('.module-panel').forEach((p) => p.classList.remove('active'));
+        document.getElementById(`panel-${tabId}`).classList.add('active');
+        renderNav();
+        if (tabId === 'decision') renderDecisionEngine();
+        if (tabId === 'bible') renderUseCaseBible();
+        if (tabId === 'arena') renderRuntimeArena();
+        if (tabId === 'cost') renderCostLab();
+        if (tabId === 'setup') renderSetupFiles();
+      }
+
+      /* --------------------------------------------------------------------
+         10. MODULE 1: DECISION ENGINE
+      -------------------------------------------------------------------- */
+      function getTuningNotes(scaleId, prioId) {
+        const scaleNotes = {
+          solo: 'Keep everything single-process or free tier ($0/mo). Use embedded SQLite (bun:sqlite / D1) and skip Kubernetes, Redis, or paid auth SaaS.',
+          indie: 'Optimize for 1-person velocity. Managed Postgres (Neon/Supabase) + Cloudflare R2 gives you zero-ops reliability under $25/mo.',
+          growth: 'Egress and PaaS overages begin dominating at 10M req/mo. Push media to Cloudflare R2 ($0 egress) and add edge caching or read replicas.',
+          enterprise: 'At 500M+ req/mo, compute density and tail latency rule unit economics. Offload hot paths to Go/Rust binaries and enforce Postgres RLS + OpenTelemetry.'
+        };
+        const prioNotes = {
+          ship2h: 'Stay inside one strict TypeScript monorepo (Bun + Hono + Drizzle) so your coding agent shares end-to-end types across DB, API, and UI.',
+          zerocost: 'Pair Cloudflare Workers (CPU-time billing) + R2 ($0 egress) or a single $6 Go binary so idle overhead stays near $0.',
+          maxperf: 'Lean into Rust (Axum + SQLx) or Go (Chi + sqlc) so strict compilers mathematically eliminate memory bugs and race conditions before runtime.',
+          offline: 'Store primary state locally (bun:sqlite, IndexedDB/Yjs, or Tauri SQLite) so every click responds in <1ms even on airplane Wi-Fi.',
+          upgrade: 'Start local with Drizzle/Hono or SQLite/Litestream so migrating from 1 local user to 100k multi-tenant SaaS users requires zero business-logic rewrites.'
+        };
+        return { scale: scaleNotes[scaleId], prio: prioNotes[prioId] };
+      }
+
+      function renderDecisionEngine() {
+        const panel = document.getElementById('panel-decision');
+        const bp = BLUEPRINTS.find((b) => b.id === state.archetype) || BLUEPRINTS[1];
+        const tuning = getTuningNotes(state.scale, state.priority);
+        const scaleObj = SCALES.find((s) => s.id === state.scale);
+        const prioObj = PRIORITIES.find((p) => p.id === state.priority);
+
+        panel.innerHTML = `
+          <div class="stack-gap">
+            <!-- Selector Cockpit -->
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+                <div>
+                  <span class="section-kicker">${ICONS.sliders(13)} INTERACTIVE STACK ARCHITECT</span>
+                  <h2 class="section-title">Compute Your Optimal 2026 Agentic Stack</h2>
+                  <p class="section-desc">Choose your product archetype, target scale, and top engineering priority. Now that AI writes the syntax, choose by operational physics and compiler guardrails.</p>
+                </div>
+                <span class="badge badge-cyan">${ICONS.sparkles(12)} LIVE DECISION ENGINE</span>
+              </div>
+
+              <!-- 1. Archetype -->
+              <div style="margin-bottom:20px;">
+                <span class="selector-label">1. Product Archetype (9 Blueprints)</span>
+                <div class="archetype-grid">
+                  ${BLUEPRINTS.map(
+                    (b) => `
+                    <button class="pill-card ${b.id === state.archetype ? 'selected' : ''}" data-arch="${b.id}">
+                      <div class="pill-icon">${ICONS[b.icon](16)}</div>
+                      <div style="min-width:0;">
+                        <div class="pill-title truncate">${b.shortTitle}</div>
+                        <div class="pill-sub truncate">${b.category} · ${b.postAiDifficulty}</div>
+                      </div>
+                    </button>
+                  `
+                  ).join('')}
+                </div>
+              </div>
+
+              <!-- 2 & 3. Scale + Priority -->
+              <div class="grid-2" style="padding-top:18px;border-top:1px solid var(--border-hairline);">
+                <div>
+                  <span class="selector-label">2. Target Scale Tier</span>
+                  <div class="choice-row">
+                    ${SCALES.map(
+                      (s) => `
+                      <button class="choice-pill ${s.id === state.scale ? 'selected-indigo' : ''}" data-scale="${s.id}">
+                        <span style="font-weight:600;">${s.label}</span>
+                        <span class="mono" style="font-size:11px;opacity:0.75;">${s.sub}</span>
+                      </button>
+                    `
+                    ).join('')}
+                  </div>
+                </div>
+                <div>
+                  <span class="selector-label">3. Primary Engineering Priority</span>
+                  <div class="choice-row">
+                    ${PRIORITIES.map(
+                      (p) => `
+                      <button class="choice-pill ${p.id === state.priority ? 'selected-emerald' : ''}" data-prio="${p.id}">
+                        ${ICONS[p.icon](13)}
+                        <span>${p.label}</span>
+                      </button>
+                    `
+                    ).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Recommendation Output -->
+            <div class="card" style="border-color: var(--cyan-border); box-shadow: var(--shadow-glow-cyan);">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;padding-bottom:20px;border-bottom:1px solid var(--border-hairline);">
+                <div style="max-width:780px;">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                    <span class="badge badge-cyan">${ICONS[bp.icon](12)} RECOMMENDED STACK</span>
+                    <span class="badge badge-emerald">Pre-AI: ${bp.preAiDifficulty} → Now: ${bp.postAiDifficulty}</span>
+                    <span class="badge badge-indigo">${scaleObj.label} · ${prioObj.label}</span>
+                  </div>
+                  <h3 style="font-size:24px;font-weight:800;letter-spacing:-0.025em;color:#fff;line-height:1.25;">${bp.primaryStack}</h3>
+                  <p style="font-size:14px;color:var(--text-secondary);margin-top:8px;">${bp.superpower}</p>
+                </div>
+                <button class="btn-primary" id="jump-setup-btn">
+                  ${ICONS.fileCode(16)}
+                  <span>Open AGENTS.md for this Stack</span>
+                  ${ICONS.arrowRight(15)}
+                </button>
+              </div>
+
+              <!-- 5-Layer Visual Pipeline -->
+              <div style="padding:22px 0;border-bottom:1px solid var(--border-hairline);">
+                <span class="selector-label" style="margin-bottom:12px;">5-Layer Visual Architecture Pipeline</span>
+                <div class="pipeline-grid">
+                  ${bp.pipeline
+                    .map(
+                      (node, idx) => `
+                    <div class="pipeline-node">
+                      <div>
+                        <span class="pipeline-step">0${idx + 1} · ${node.layer}</span>
+                        <div class="pipeline-tech">${node.tech}</div>
+                      </div>
+                      <div class="pipeline-role">${node.role}</div>
+                      ${idx < bp.pipeline.length - 1 ? `<div class="pipeline-arrow">${ICONS.arrowRight(10)}</div>` : ''}
+                    </div>
+                  `
+                    )
+                    .join('')}
+                </div>
+              </div>
+
+              <!-- Agentic Unlock + Dynamic Scale/Priority Tuning -->
+              <div class="grid-2" style="padding:20px 0;border-bottom:1px solid var(--border-hairline);">
+                <div class="callout-box callout-indigo">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--indigo);margin-bottom:8px;">
+                    ${ICONS.sparkles(15)} THE AGENTIC UNLOCK
+                  </div>
+                  <p style="font-size:13.5px;color:#E2E8F0;line-height:1.55;">${bp.agenticUnlock}</p>
+                </div>
+                <div class="callout-box callout-emerald">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--emerald);margin-bottom:8px;">
+                    ${ICONS.zap(15)} TUNED FOR ${scaleObj.label.toUpperCase()} + ${prioObj.label.toUpperCase()}
+                  </div>
+                  <p style="font-size:12.5px;color:#E2E8F0;margin-bottom:7px;line-height:1.5;"><strong>Scale Rule:</strong> ${tuning.scale}</p>
+                  <p style="font-size:12.5px;color:#E2E8F0;line-height:1.5;"><strong>Priority Rule:</strong> ${tuning.prio}</p>
+                </div>
+              </div>
+
+              <!-- Day-1 to Enterprise Upgrade Path -->
+              <div style="padding:20px 0;border-bottom:1px solid var(--border-hairline);">
+                <span class="selector-label" style="margin-bottom:12px;">Day-1 to Enterprise Upgrade Path (Zero-Rewrite Evolution)</span>
+                <div class="timeline-grid">
+                  <div class="timeline-card" style="border-top-color:var(--emerald);">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--emerald);margin-bottom:6px;">STAGE 1 // LOCAL PROTOTYPE</div>
+                    <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">${bp.upgradePath.day1}</p>
+                  </div>
+                  <div class="timeline-card" style="border-top-color:var(--cyan);">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--cyan);margin-bottom:6px;">STAGE 2 // MULTI-USER SAAS</div>
+                    <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">${bp.upgradePath.saas}</p>
+                  </div>
+                  <div class="timeline-card" style="border-top-color:var(--indigo);">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--indigo);margin-bottom:6px;">STAGE 3 // ENTERPRISE PLATFORM</div>
+                    <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;">${bp.upgradePath.enterprise}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Head-to-Head Trade-offs -->
+              <div style="padding-top:20px;">
+                <span class="selector-label" style="margin-bottom:12px;">Head-to-Head Trade-Offs: Recommended vs. Strong Alternative vs. Common Trap</span>
+                <div class="grid-3">
+                  <div class="callout-box callout-emerald">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--emerald);margin-bottom:8px;">✓ RECOMMENDED PROS</div>
+                    <ul class="list-clean">
+                      ${bp.pros.map((p) => `<li><span style="color:var(--emerald);">▸</span><span>${p}</span></li>`).join('')}
+                    </ul>
+                  </div>
+                  <div class="callout-box callout-amber">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:6px;">⇄ STRONG ALTERNATIVE & CONS</div>
+                    <div class="mono" style="font-size:12px;color:#fff;margin-bottom:8px;padding:6px 8px;background:rgba(0,0,0,0.3);border-radius:7px;">${bp.altStack}</div>
+                    <ul class="list-clean">
+                      ${bp.cons.map((c) => `<li><span style="color:var(--amber);">▸</span><span>${c}</span></li>`).join('')}
+                    </ul>
+                  </div>
+                  <div class="callout-box callout-rose">
+                    <div class="mono" style="font-size:11px;font-weight:700;color:var(--rose);margin-bottom:8px;">✕ COMMON TRAP TO AVOID</div>
+                    <p style="font-size:13px;color:#FECDD3;line-height:1.55;">${bp.trapStack}</p>
+                    <div class="mono" style="font-size:11px;color:var(--text-muted);margin-top:12px;">Cost @ 100k Users: <strong style="color:#fff;">${bp.costSnapshot.u100k}</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        panel.querySelectorAll('[data-arch]').forEach((b) =>
+          b.addEventListener('click', () => { state.archetype = b.dataset.arch; renderDecisionEngine(); })
+        );
+        panel.querySelectorAll('[data-scale]').forEach((b) =>
+          b.addEventListener('click', () => { state.scale = b.dataset.scale; renderDecisionEngine(); })
+        );
+        panel.querySelectorAll('[data-prio]').forEach((b) =>
+          b.addEventListener('click', () => { state.priority = b.dataset.prio; renderDecisionEngine(); })
+        );
+        document.getElementById('jump-setup-btn').addEventListener('click', () => {
+          state.setupId = bp.setupId;
+          switchTab('setup');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         11. MODULE 2: USE-CASE BIBLE + SLIDE-OVER DRAWER
+      -------------------------------------------------------------------- */
+      const BIBLE_CATEGORIES = ['All', 'Personal', 'SaaS', 'Realtime', 'Edge', 'Extension', 'Business Bridge', 'Desktop'];
+
+      function renderUseCaseBible() {
+        const panel = document.getElementById('panel-bible');
+        const q = state.bibleSearch.toLowerCase().trim();
+        const filtered = BLUEPRINTS.filter((bp) => {
+          const catOk = state.bibleCategory === 'All' || bp.category === state.bibleCategory;
+          const searchOk = !q || bp.title.toLowerCase().includes(q) || bp.primaryStack.toLowerCase().includes(q) || bp.superpower.toLowerCase().includes(q);
+          return catOk && searchOk;
+        });
+
+        panel.innerHTML = `
+          <div class="stack-gap">
+            <div class="card" style="padding:18px 20px;">
+              <div class="filter-bar">
+                <div class="choice-row">
+                  ${BIBLE_CATEGORIES.map(
+                    (cat) => `
+                    <button class="choice-pill ${state.bibleCategory === cat ? 'selected-indigo' : ''}" data-cat="${cat}">
+                      ${cat}
+                    </button>
+                  `
+                  ).join('')}
+                </div>
+                <div class="search-box">
+                  ${ICONS.search(15)}
+                  <input type="text" id="bible-search-input" class="search-input" value="${escapeHtml(state.bibleSearch)}" placeholder="Filter Rust, WXT, Tauri, Edge..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="grid-3">
+              ${filtered
+                .map(
+                  (bp) => `
+                <button class="bp-card" data-open-bp="${bp.id}">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;">
+                      <div class="pill-icon" style="color:var(--${bp.accent});border-color:var(--${bp.accent}-border);background:var(--${bp.accent}-soft);">
+                        ${ICONS[bp.icon](17)}
+                      </div>
+                      <span class="badge">${bp.category}</span>
+                    </div>
+                    <h3 style="font-size:16.5px;font-weight:700;color:#fff;margin-bottom:6px;line-height:1.3;">${bp.title}</h3>
+                    <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.5;margin-bottom:14px;">${bp.superpower}</p>
+                    <div style="background:var(--bg-canvas);border:1px solid var(--border-hairline);border-radius:10px;padding:10px 12px;">
+                      <div class="mono" style="font-size:10px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Primary 2026 Stack</div>
+                      <div class="mono" style="font-size:12px;color:var(--cyan);font-weight:600;line-height:1.4;">${bp.primaryStack}</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border-hairline);">
+                    <span class="diff-shift">
+                      <span style="color:var(--text-muted);text-decoration:line-through;">${bp.preAiDifficulty}</span>
+                      <span style="color:var(--emerald);font-weight:700;">→ ${bp.postAiDifficulty}</span>
+                    </span>
+                    <span class="mono" style="font-size:11.5px;color:var(--cyan);display:inline-flex;align-items:center;gap:4px;">
+                      Inspect ${ICONS.arrowRight(13)}
+                    </span>
+                  </div>
+                </button>
+              `
+                )
+                .join('')}
+            </div>
+            ${filtered.length === 0 ? `<div class="card" style="text-align:center;color:var(--text-muted);padding:40px;">No blueprints match "${escapeHtml(state.bibleSearch)}".</div>` : ''}
+          </div>
+        `;
+
+        panel.querySelectorAll('[data-cat]').forEach((b) =>
+          b.addEventListener('click', () => { state.bibleCategory = b.dataset.cat; renderUseCaseBible(); })
+        );
+        const searchEl = document.getElementById('bible-search-input');
+        searchEl.addEventListener('input', (e) => {
+          state.bibleSearch = e.target.value;
+          const pos = e.target.selectionStart;
+          renderUseCaseBible();
+          const newEl = document.getElementById('bible-search-input');
+          newEl.focus();
+          newEl.setSelectionRange(pos, pos);
+        });
+        panel.querySelectorAll('[data-open-bp]').forEach((card) =>
+          card.addEventListener('click', () => openDrawer(card.dataset.openBp))
+        );
+      }
+
+      function openDrawer(bpId) {
+        const bp = BLUEPRINTS.find((b) => b.id === bpId);
+        if (!bp) return;
+        state.drawerBlueprintId = bpId;
+
+        const drawer = document.getElementById('drawer-panel');
+        const backdrop = document.getElementById('drawer-backdrop');
+
+        drawer.innerHTML = `
+          <div class="drawer-header">
+            <div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                <span class="badge badge-cyan">${bp.category}</span>
+                <span class="badge badge-emerald">Pre-AI: ${bp.preAiDifficulty} → Now: ${bp.postAiDifficulty}</span>
+              </div>
+              <h2 style="font-size:21px;font-weight:800;color:#fff;letter-spacing:-0.02em;">${bp.title}</h2>
+              <div class="mono" style="font-size:12.5px;color:var(--cyan);margin-top:4px;">${bp.primaryStack}</div>
+            </div>
+            <button class="btn-secondary" id="close-drawer-btn" style="padding:8px;" aria-label="Close drawer">${ICONS.x(17)}</button>
+          </div>
+
+          <div class="drawer-body">
+            <!-- Pre-2025 vs 2026 Unlock -->
+            <div class="grid-2">
+              <div class="callout-box callout-rose">
+                <div class="mono" style="font-size:10.5px;font-weight:700;color:var(--rose);margin-bottom:6px;">PRE-2025 BOTTLENECK</div>
+                <p style="font-size:12.5px;color:#E2E8F0;line-height:1.5;">${bp.pre2025Bottleneck}</p>
+              </div>
+              <div class="callout-box callout-indigo">
+                <div class="mono" style="font-size:10.5px;font-weight:700;color:var(--indigo);margin-bottom:6px;">2026 AGENTIC UNLOCK</div>
+                <p style="font-size:12.5px;color:#E2E8F0;line-height:1.5;">${bp.agenticUnlock}</p>
+              </div>
+            </div>
+
+            <!-- 5-Layer Breakdown -->
+            <div>
+              <span class="selector-label">5-Layer Stack Breakdown</span>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                ${bp.pipeline
+                  .map(
+                    (l, i) => `
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 13px;background:var(--bg-canvas);border:1px solid var(--border-hairline);border-radius:10px;flex-wrap:wrap;">
+                    <span class="mono" style="font-size:11px;color:var(--cyan);width:140px;">0${i + 1} · ${l.layer}</span>
+                    <span class="mono" style="font-size:12.5px;font-weight:600;color:#fff;flex:1;">${l.tech}</span>
+                    <span style="font-size:12px;color:var(--text-secondary);">${l.role}</span>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+            </div>
+
+            <!-- ASCII Architecture Diagram -->
+            <div>
+              <span class="selector-label">Reference Architecture Diagram</span>
+              <div class="ascii-box">${escapeHtml(bp.ascii)}</div>
+            </div>
+
+            <!-- Cost at Scale Snapshot -->
+            <div>
+              <span class="selector-label">Cost-at-Scale Snapshot</span>
+              <div class="grid-3">
+                <div class="card-elevated">
+                  <div class="mono" style="font-size:10.5px;color:var(--text-muted);">1K USERS</div>
+                  <div class="mono" style="font-size:14px;font-weight:700;color:var(--emerald);margin-top:4px;">${bp.costSnapshot.u1k}</div>
+                </div>
+                <div class="card-elevated">
+                  <div class="mono" style="font-size:10.5px;color:var(--text-muted);">100K USERS</div>
+                  <div class="mono" style="font-size:14px;font-weight:700;color:var(--cyan);margin-top:4px;">${bp.costSnapshot.u100k}</div>
+                </div>
+                <div class="card-elevated">
+                  <div class="mono" style="font-size:10.5px;color:var(--text-muted);">10M USERS</div>
+                  <div class="mono" style="font-size:14px;font-weight:700;color:var(--amber);margin-top:4px;">${bp.costSnapshot.u10m}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pros & Cons -->
+            <div class="grid-2">
+              <div class="callout-box callout-emerald">
+                <div class="mono" style="font-size:11px;font-weight:700;color:var(--emerald);margin-bottom:8px;">PROS</div>
+                <ul class="list-clean">
+                  ${bp.pros.map((p) => `<li><span style="color:var(--emerald);">✓</span><span>${p}</span></li>`).join('')}
+                </ul>
+              </div>
+              <div class="callout-box callout-amber">
+                <div class="mono" style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:8px;">CONS & TRADE-OFFS</div>
+                <ul class="list-clean">
+                  ${bp.cons.map((c) => `<li><span style="color:var(--amber);">!</span><span>${c}</span></li>`).join('')}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="drawer-footer">
+            <button class="btn-secondary" id="drawer-open-setup">
+              ${ICONS.fileCode(15)} View AGENTS.md
+            </button>
+            <button class="btn-primary" id="drawer-copy-prompt">
+              ${ICONS.copy(15)} Copy Starter Prompt for Coding Agent
+            </button>
+          </div>
+        `;
+
+        backdrop.classList.add('open');
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+
+        document.getElementById('close-drawer-btn').addEventListener('click', closeDrawer);
+        document.getElementById('drawer-copy-prompt').addEventListener('click', () => {
+          copyText(bp.starterPrompt, `Copied starter prompt for ${bp.shortTitle}`);
+        });
+        document.getElementById('drawer-open-setup').addEventListener('click', () => {
+          const targetId = bp.setupId;
+          closeDrawer();
+          state.setupId = targetId;
+          switchTab('setup');
+        });
+      }
+
+      function closeDrawer() {
+        state.drawerBlueprintId = null;
+        document.getElementById('drawer-backdrop').classList.remove('open');
+        const drawer = document.getElementById('drawer-panel');
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+      }
+
+      /* --------------------------------------------------------------------
+         12. MODULE 3: RUNTIME ARENA & AGENTIC FEEDBACK LOOP
+      -------------------------------------------------------------------- */
+      function renderRuntimeArena() {
+        const panel = document.getElementById('panel-arena');
+        const isStrict = state.loopMode === 'strict';
+
+        const loopStages = isStrict
+          ? [
+              { num: '01', title: 'Agent Writes Code', badge: 'Fast Draft', desc: 'Gemini Neon / Claude emits Rust, Go, or Strict TS from your schema spec.' },
+              { num: '02', title: 'Compiler / Typecheck Catch', badge: '0ms Guardrail', desc: '`cargo clippy`, `go vet`, or `tsc --noEmit` catches null refs, race conditions & SQL typos instantly.' },
+              { num: '03', title: 'Autonomous Auto-Fix', badge: 'Self-Healing', desc: 'Agent reads exact line:col compiler diagnostics and patches root causes in 1–2 loops.' },
+              { num: '04', title: 'Production Reliability', badge: '99.9% Safe', desc: 'Memory-safe, type-verified binary ships with minimal human line-by-line review.' }
+            ]
+          : [
+              { num: '01', title: 'Agent Writes Code', badge: 'Plausible Draft', desc: 'Agent emits untyped JS or loose Python that looks syntactically clean.' },
+              { num: '02', title: 'No Compiler Gate', badge: 'Silent Pass', desc: 'Hallucinated object keys, wrong arg types, and async races sail straight past build time.' },
+              { num: '03', title: 'Manual Debug Loop', badge: 'Token Burn', desc: 'Errors only surface in browser or prod logs; humans paste stack traces back to AI.' },
+              { num: '04', title: 'Runtime Fragility', badge: 'High Drift', desc: 'Subtle undefined errors and schema drift accumulate as the codebase grows.' }
+            ];
+
+        const loopMetrics = isStrict
+          ? { catchRate: '94%', tokenEff: '3.2x Higher', bugRate: '-82% Prod Bugs' }
+          : { catchRate: '28%', tokenEff: '1.0x Baseline', bugRate: 'High Runtime Drift' };
+
+        const sortedRuntimes = [...RUNTIMES].sort((a, b) => {
+          const k = state.arenaSortKey;
+          const mult = state.arenaSortDir === 'asc' ? 1 : -1;
+          return (a[k] - b[k]) * mult;
+        });
+
+        panel.innerHTML = `
+          <div class="stack-gap">
+            <!-- Agentic Feedback Loop Visualizer -->
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
+                <div>
+                  <span class="section-kicker">${ICONS.sparkles(13)} AGENTIC FEEDBACK LOOP VISUALIZER</span>
+                  <h2 class="section-title">Why Strict Compilers Are the Ultimate AI Multiplier</h2>
+                  <p class="section-desc">Toggle between a Strict Compiler Loop and a Dynamic Runtime Loop to see how compiler diagnostics turn AI coding agents into self-healing systems.</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                  <div class="segmented">
+                    <button class="seg-btn ${isStrict ? 'active-emerald' : ''}" data-loop="strict">Strict (Rust / Go / TS)</button>
+                    <button class="seg-btn ${!isStrict ? 'active-rose' : ''}" data-loop="dynamic">Dynamic (Untyped JS / Py)</button>
+                  </div>
+                  <button class="btn-secondary" id="animate-loop-btn">${ICONS.play(13)} Step</button>
+                </div>
+              </div>
+
+              <div class="grid-4" style="margin-bottom:16px;">
+                ${loopStages
+                  .map(
+                    (st, i) => `
+                  <div class="loop-stage ${state.loopStep === i ? (isStrict ? 'pulse-emerald' : 'pulse-rose') : ''}" data-step="${i}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                      <span class="mono" style="font-size:11px;font-weight:700;color:var(--text-muted);">STEP ${st.num}</span>
+                      <span class="badge ${isStrict ? 'badge-emerald' : 'badge-rose'}">${st.badge}</span>
+                    </div>
+                    <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;">${st.title}</div>
+                    <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.45;">${st.desc}</p>
+                  </div>
+                `
+                  )
+                  .join('')}
+              </div>
+
+              <div class="grid-3">
+                <div class="card-elevated" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="mono" style="font-size:11.5px;color:var(--text-secondary);">Pre-Runtime Hallucination Catch</span>
+                  <span class="mono" style="font-size:16px;font-weight:800;color:${isStrict ? 'var(--emerald)' : 'var(--rose)'};">${loopMetrics.catchRate}</span>
+                </div>
+                <div class="card-elevated" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="mono" style="font-size:11.5px;color:var(--text-secondary);">Agent Token Efficiency</span>
+                  <span class="mono" style="font-size:16px;font-weight:800;color:${isStrict ? 'var(--cyan)' : 'var(--amber)'};">${loopMetrics.tokenEff}</span>
+                </div>
+                <div class="card-elevated" style="display:flex;justify-content:space-between;align-items:center;">
+                  <span class="mono" style="font-size:11.5px;color:var(--text-secondary);">Production Reliability Delta</span>
+                  <span class="mono" style="font-size:16px;font-weight:800;color:${isStrict ? 'var(--emerald)' : 'var(--rose)'};">${loopMetrics.bugRate}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Metric Bars -->
+            <div class="grid-2">
+              <div class="card">
+                <div class="mono" style="font-size:11.5px;font-weight:700;color:var(--cyan);margin-bottom:14px;">COMPILER-AS-VERIFIER SCORE (AI SELF-HEALING)</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  ${RUNTIMES.map(
+                    (rt) => `
+                    <div>
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+                        <span style="font-weight:600;color:#fff;">${rt.name}</span>
+                        <span class="mono" style="color:${rt.color};font-weight:700;">${rt.verifierScore}/100</span>
+                      </div>
+                      <div class="bar-track"><div class="bar-fill" style="width:${rt.verifierScore}%;background:${rt.color};"></div></div>
+                    </div>
+                  `
+                  ).join('')}
+                </div>
+              </div>
+              <div class="card">
+                <div class="mono" style="font-size:11.5px;font-weight:700;color:var(--emerald);margin-bottom:14px;">SOLO-TO-SAAS LEVERAGE vs ECOSYSTEM VELOCITY</div>
+                <div style="display:flex;flex-direction:column;gap:12px;">
+                  ${RUNTIMES.map(
+                    (rt) => `
+                    <div>
+                      <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px;">
+                        <span style="font-weight:600;color:#fff;">${rt.name}</span>
+                        <span class="mono" style="color:var(--text-secondary);">Leverage <strong style="color:var(--emerald);">${rt.leverageScore}</strong> · Velocity <strong style="color:var(--indigo);">${rt.velocityScore}</strong></span>
+                      </div>
+                      <div class="bar-track"><div class="bar-fill" style="width:${rt.leverageScore}%;background:linear-gradient(90deg, var(--emerald), var(--cyan));"></div></div>
+                    </div>
+                  `
+                  ).join('')}
+                </div>
+              </div>
+            </div>
+
+            <!-- Sortable Runtime Arena Table -->
+            <div class="arena-table-wrap">
+              <div style="padding:16px 18px;border-bottom:1px solid var(--border-hairline);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                <div>
+                  <h3 style="font-size:16px;font-weight:700;color:#fff;">6 Modern Runtimes — Head-to-Head Matrix</h3>
+                  <p style="font-size:12px;color:var(--text-secondary);">Click any numeric column header to sort the arena.</p>
+                </div>
+                <span class="badge badge-cyan">Sorted by: ${state.arenaSortKey} (${state.arenaSortDir.toUpperCase()})</span>
+              </div>
+              <table class="arena-table">
+                <thead>
+                  <tr>
+                    <th>Runtime</th>
+                    <th data-sort="coldStartMs">Cold Start ↕</th>
+                    <th data-sort="memMb">Idle RAM ↕</th>
+                    <th data-sort="verifierScore">Compiler Verifier ↕</th>
+                    <th data-sort="velocityScore">Velocity ↕</th>
+                    <th data-sort="leverageScore">Solo→SaaS ↕</th>
+                    <th>Best For / Avoid When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${sortedRuntimes
+                    .map(
+                      (rt) => `
+                    <tr>
+                      <td>
+                        <div style="font-weight:700;color:${rt.color};">${rt.name}</div>
+                        <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px;">${rt.tagline}</div>
+                      </td>
+                      <td class="mono" style="white-space:nowrap;">${rt.coldStart}</td>
+                      <td class="mono" style="white-space:nowrap;">${rt.memory}</td>
+                      <td class="mono"><span class="badge ${rt.badgeClass}">${rt.verifierScore}/100</span></td>
+                      <td class="mono">${rt.velocityScore}/100</td>
+                      <td class="mono">${rt.leverageScore}/100</td>
+                      <td style="font-size:12px;line-height:1.45;">
+                        <div style="color:#E2E8F0;margin-bottom:4px;"><strong style="color:var(--emerald);">Best:</strong> ${rt.bestFor}</div>
+                        <div style="color:var(--text-muted);"><strong style="color:var(--rose);">Avoid:</strong> ${rt.avoidWhen}</div>
+                      </td>
+                    </tr>
+                  `
+                    )
+                    .join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+        panel.querySelectorAll('[data-loop]').forEach((b) =>
+          b.addEventListener('click', () => { state.loopMode = b.dataset.loop; state.loopStep = 0; renderRuntimeArena(); })
+        );
+        panel.querySelectorAll('[data-step]').forEach((card) =>
+          card.addEventListener('click', () => { state.loopStep = Number(card.dataset.step); renderRuntimeArena(); })
+        );
+        document.getElementById('animate-loop-btn').addEventListener('click', () => {
+          state.loopStep = (state.loopStep + 1) % 4;
+          renderRuntimeArena();
+        });
+        panel.querySelectorAll('[data-sort]').forEach((th) =>
+          th.addEventListener('click', () => {
+            const key = th.dataset.sort;
+            if (state.arenaSortKey === key) {
+              state.arenaSortDir = state.arenaSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              state.arenaSortKey = key;
+              state.arenaSortDir = key === 'coldStartMs' || key === 'memMb' ? 'asc' : 'desc';
+            }
+            renderRuntimeArena();
+          })
+        );
+      }
+
+      /* --------------------------------------------------------------------
+         13. MODULE 4: COST-AT-SCALE PRICING LAB
+      -------------------------------------------------------------------- */
+      function computeCosts() {
+        const reqs = sliderToReqs(state.costReqsIdx);
+        const reqsM = reqs / 1_000_000;
+        const wallMs = state.costWallMs;
+        const cpuRatio = state.costCpuPct / 100;
+        const cpuMs = wallMs * cpuRatio;
+        const egressGb = state.costEgressGb;
+        const ws = state.costWs;
+        const avgRps = reqs / (30 * 24 * 3600);
+
+        // 1. Cloudflare Edge (Workers CPU-time + $0 Egress R2 + Durable Objects Hibernatable WS)
+        const cfBase = 5;
+        const cfCompute = Math.max(0, reqsM - 10) * 0.30 + Math.max(0, (reqs * cpuMs) / 1_000_000 - 30) * 0.02;
+        const cfEgress = 0;
+        const cfWs = ws > 0 ? 5 + (ws / 1000) * 2.2 : 0;
+        const cfTotal = Math.round(cfBase + cfCompute + cfEgress + cfWs);
+
+        // 2. Lean Go/Rust Containers (Hetzner/Fly.io flat compute + cheap bandwidth)
+        const cpuWork = Math.max(0.35, cpuRatio * (wallMs / 60));
+        const nodesReq = Math.ceil((avgRps * cpuWork) / 170);
+        const nodesWs = Math.ceil(ws / 18000);
+        const nodes = Math.max(2, nodesReq + nodesWs);
+        const contBase = 15; // Managed/Self-hosted PG/SQLite backup
+        const contCompute = nodes * 18;
+        const contEgress = Math.max(0, egressGb - 2000) * 0.012;
+        const contWs = 0;
+        const contTotal = Math.round(contBase + contCompute + contEgress + contWs);
+
+        // 3. AWS Serverless (Lambda 512MB Wall-Time + HTTP API GW + $0.09/GB Egress + API GW WS)
+        const awsBase = 25; // Aurora/Dynamo base
+        const awsApiGw = reqsM * 1.00;
+        const awsLambdaReq = Math.max(0, reqsM - 1) * 0.20;
+        const awsGbSec = reqs * (wallMs / 1000) * 0.5;
+        const awsDuration = Math.max(0, awsGbSec - 400_000) * 0.00001667;
+        const awsCompute = awsApiGw + awsLambdaReq + awsDuration;
+        const awsEgress = Math.max(0, egressGb - 100) * 0.09;
+        const awsWs = ws > 0 ? ((ws * 43200) / 1_000_000) * 0.25 + (ws / 1000) * 4.5 : 0;
+        const awsTotal = Math.round(awsBase + awsCompute + awsEgress + awsWs);
+
+        // 4. Managed PaaS (Vercel Pro + Managed DB + Pusher/Ably WS)
+        const paasBase = 45;
+        const paasCompute = reqsM * 0.65 + reqs * (wallMs / 1000) * 0.000011;
+        const paasEgress = Math.max(0, egressGb - 1000) * 0.15;
+        const paasWs = ws > 0 ? 49 + (ws / 1000) * 14 : 0;
+        const paasTotal = Math.round(paasBase + paasCompute + paasEgress + paasWs);
+
+        const items = [
+          { id: 'cf', name: 'Cloudflare Edge', sub: 'Workers CPU-Time + R2 ($0 Egress) + DO', color: 'var(--cyan)', total: cfTotal, compute: Math.round(cfCompute), egress: 0, ws: Math.round(cfWs), base: cfBase },
+          { id: 'cont', name: 'Lean Go / Rust Containers', sub: `${nodes}x HA Nodes (Hetzner / Fly.io)`, color: 'var(--emerald)', total: contTotal, compute: Math.round(contCompute), egress: Math.round(contEgress), ws: 0, base: contBase },
+          { id: 'aws', name: 'AWS Serverless', sub: 'Lambda Wall-Time + API GW + $0.09/GB Egress', color: 'var(--amber)', total: awsTotal, compute: Math.round(awsCompute), egress: Math.round(awsEgress), ws: Math.round(awsWs), base: awsBase },
+          { id: 'paas', name: 'Managed PaaS', sub: 'Vercel Pro + Managed DB + WS Add-on', color: 'var(--indigo)', total: paasTotal, compute: Math.round(paasCompute), egress: Math.round(paasEgress), ws: Math.round(paasWs), base: paasBase }
+        ];
+
+        const sorted = [...items].sort((a, b) => a.total - b.total);
+        const winner = sorted[0];
+        const runnerUp = sorted[1];
+        const maxCost = Math.max(...items.map((x) => x.total), 50);
+
+        let cfoInsight = '';
+        if (winner.id === 'cf') {
+          if (wallMs >= 1000 && state.costCpuPct <= 20) {
+            cfoInsight = `Cloudflare Edge crushes AWS Lambda here: your workload waits ${wallMs}ms on I/O (like LLM streaming) with only ${Math.round(cpuMs)}ms of active CPU. Lambda bills the full wall-clock duration ($${Math.round(awsDuration).toLocaleString()}/mo), whereas Workers bill only CPU ticks.`;
+          } else if (egressGb >= 3000) {
+            cfoInsight = `Bandwidth egress is the silent killer: AWS charges ~$${Math.round(awsEgress).toLocaleString()}/mo for ${formatGb(egressGb)} of egress, while Cloudflare R2 charges $0.00/GB—saving you $${(runnerUp.total - winner.total).toLocaleString()}/mo.`;
+          } else {
+            cfoInsight = `Cloudflare Edge delivers the lowest total bill ($${winner.total.toLocaleString()}/mo) by combining zero idle server overhead, CPU-time billing, and hibernatable WebSockets.`;
+          }
+        } else {
+          cfoInsight = `Lean Go/Rust containers win ($${winner.total.toLocaleString()}/mo across ${nodes} HA nodes). Under sustained high CPU (${state.costCpuPct}%), massive request volume (${formatReqs(reqs)}/mo), or ${ws.toLocaleString()} live WebSockets, flat bare-metal compute density beats per-invocation cloud pricing.`;
+        }
+
+        return { reqs, items, winner, runnerUp, maxCost, cfoInsight };
+      }
+
+      function renderCostLab() {
+        const panel = document.getElementById('panel-cost');
+        const sim = computeCosts();
+
+        panel.innerHTML = `
+          <div class="stack-gap">
+            <!-- Controls & Presets -->
+            <div class="card">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
+                <div>
+                  <span class="section-kicker">${ICONS.dollar(13)} LIVE INFRASTRUCTURE SIMULATOR</span>
+                  <h2 class="section-title">Cost-at-Scale Pricing Lab (2026 Rates)</h2>
+                  <p class="section-desc">Drag sliders to expose AWS Lambda's wall-time penalty during LLM streaming, $0.09/GB egress shock, and bare-metal Go/Rust density.</p>
+                </div>
+                <div class="choice-row">
+                  ${COST_PRESETS.map(
+                    (p) => `<button class="btn-secondary" data-preset="${p.id}" style="font-size:11.5px;padding:7px 11px;">${p.label}</button>`
+                  ).join('')}
+                </div>
+              </div>
+
+              <div class="grid-3" style="margin-bottom:14px;">
+                <div class="slider-card">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="mono" style="font-size:11px;color:var(--text-secondary);">MONTHLY API REQUESTS</span>
+                    <span class="mono" id="val-reqs" style="font-size:14px;font-weight:700;color:var(--cyan);">${formatReqs(sim.reqs)} / mo</span>
+                  </div>
+                  <input type="range" id="sl-reqs" min="0" max="100" step="1" value="${state.costReqsIdx}" />
+                  <div class="mono" style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);"><span>100K</span><span>10M</span><span>500M</span></div>
+                </div>
+
+                <div class="slider-card">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="mono" style="font-size:11px;color:var(--text-secondary);">AVG WALL TIME / REQ</span>
+                    <span class="mono" id="val-wall" style="font-size:14px;font-weight:700;color:var(--indigo);">${state.costWallMs} ms</span>
+                  </div>
+                  <input type="range" id="sl-wall" min="50" max="5000" step="50" value="${state.costWallMs}" />
+                  <div class="mono" style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);"><span>50ms (Fast)</span><span>2.5s</span><span>5,000ms (LLM)</span></div>
+                </div>
+
+                <div class="slider-card">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="mono" style="font-size:11px;color:var(--text-secondary);">CPU-ACTIVE RATIO</span>
+                    <span class="mono" id="val-cpu" style="font-size:14px;font-weight:700;color:var(--amber);">${state.costCpuPct}% CPU</span>
+                  </div>
+                  <input type="range" id="sl-cpu" min="5" max="90" step="5" value="${state.costCpuPct}" />
+                  <div class="mono" style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);"><span>5% I/O Wait</span><span>45%</span><span>90% Heavy CPU</span></div>
+                </div>
+              </div>
+
+              <div class="grid-2">
+                <div class="slider-card">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="mono" style="font-size:11px;color:var(--text-secondary);">MONTHLY DATA EGRESS</span>
+                    <span class="mono" id="val-egress" style="font-size:14px;font-weight:700;color:var(--emerald);">${formatGb(state.costEgressGb)}</span>
+                  </div>
+                  <input type="range" id="sl-egress" min="10" max="20000" step="50" value="${state.costEgressGb}" />
+                  <div class="mono" style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);"><span>10 GB</span><span>10 TB</span><span>20 TB</span></div>
+                </div>
+
+                <div class="slider-card">
+                  <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <span class="mono" style="font-size:11px;color:var(--text-secondary);">CONCURRENT WEBSOCKETS</span>
+                    <span class="mono" id="val-ws" style="font-size:14px;font-weight:700;color:var(--cyan);">${state.costWs.toLocaleString()} conns</span>
+                  </div>
+                  <input type="range" id="sl-ws" min="0" max="100000" step="500" value="${state.costWs}" />
+                  <div class="mono" style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);"><span>0</span><span>50,000</span><span>100,000</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dynamic Results Container (Updated smoothly on slider drag) -->
+            <div id="cost-results-wrap" class="stack-gap"></div>
+          </div>
+        `;
+
+        updateCostResults();
+
+        panel.querySelectorAll('[data-preset]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const p = COST_PRESETS.find((x) => x.id === btn.dataset.preset);
+            state.costReqsIdx = p.reqsIdx;
+            state.costWallMs = p.wall;
+            state.costCpuPct = p.cpu;
+            state.costEgressGb = p.egress;
+            state.costWs = p.ws;
+            renderCostLab();
+          });
+        });
+
+        const bindSlider = (id, key, valId, fmt) => {
+          document.getElementById(id).addEventListener('input', (e) => {
+            state[key] = Number(e.target.value);
+            document.getElementById(valId).textContent = fmt(state[key]);
+            updateCostResults();
+          });
+        };
+
+        bindSlider('sl-reqs', 'costReqsIdx', 'val-reqs', (v) => `${formatReqs(sliderToReqs(v))} / mo`);
+        bindSlider('sl-wall', 'costWallMs', 'val-wall', (v) => `${v} ms`);
+        bindSlider('sl-cpu', 'costCpuPct', 'val-cpu', (v) => `${v}% CPU`);
+        bindSlider('sl-egress', 'costEgressGb', 'val-egress', (v) => formatGb(v));
+        bindSlider('sl-ws', 'costWs', 'val-ws', (v) => `${v.toLocaleString()} conns`);
+      }
+
+      function updateCostResults() {
+        const wrap = document.getElementById('cost-results-wrap');
+        if (!wrap) return;
+        const sim = computeCosts();
+
+        wrap.innerHTML = `
+          <!-- Architectural CFO Insight -->
+          <div class="callout-box callout-emerald" style="display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:flex-start;gap:14px;flex:1;min-width:260px;">
+              <div style="padding:10px;border-radius:12px;background:var(--emerald-soft);border:1px solid var(--emerald-border);color:var(--emerald);flex-shrink:0;">
+                ${ICONS.award(22)}
+              </div>
+              <div>
+                <div class="mono" style="font-size:11px;font-weight:700;color:var(--emerald);letter-spacing:0.06em;">ARCHITECTURAL CFO INSIGHT // COST WINNER</div>
+                <div style="font-size:20px;font-weight:800;color:#fff;margin-top:2px;">${sim.winner.name} — $${sim.winner.total.toLocaleString()} / mo</div>
+                <p style="font-size:13.5px;color:#E2E8F0;margin-top:6px;line-height:1.5;">${sim.cfoInsight}</p>
+              </div>
+            </div>
+            <div class="card-elevated" style="text-align:right;min-width:175px;">
+              <div class="mono" style="font-size:10.5px;color:var(--text-muted);">MONTHLY SAVINGS</div>
+              <div class="mono" style="font-size:20px;font-weight:800;color:var(--emerald);">+$${Math.max(0, sim.runnerUp.total - sim.winner.total).toLocaleString()}</div>
+              <div class="mono" style="font-size:11px;color:var(--text-secondary);">vs ${sim.runnerUp.name}</div>
+            </div>
+          </div>
+
+          <!-- Horizontal Animated Bar Chart -->
+          <div class="card">
+            <div class="mono" style="font-size:11.5px;font-weight:700;color:var(--text-secondary);margin-bottom:16px;">MONTHLY ESTIMATED BILL COMPARISON</div>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              ${sim.items
+                .map((it) => {
+                  const pct = Math.max(3, Math.round((it.total / sim.maxCost) * 100));
+                  const isWin = it.id === sim.winner.id;
+                  return `
+                  <div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+                      <div style="display:flex;align-items:center;gap:8px;">
+                        <span style="font-weight:700;color:#fff;font-size:14px;">${it.name}</span>
+                        ${isWin ? `<span class="badge badge-emerald">COST WINNER</span>` : ''}
+                        <span class="mono" style="font-size:11.5px;color:var(--text-muted);">${it.sub}</span>
+                      </div>
+                      <span class="mono" style="font-size:16px;font-weight:800;color:#fff;">$${it.total.toLocaleString()}<span style="font-size:11.5px;font-weight:400;color:var(--text-muted);">/mo</span></span>
+                    </div>
+                    <div class="cost-bar-track">
+                      <div class="cost-bar-fill" style="width:${pct}%;background:${it.color};"></div>
+                    </div>
+                  </div>
+                `;
+                })
+                .join('')}
+            </div>
+          </div>
+
+          <!-- 4 Itemized Breakdown Cards -->
+          <div class="grid-4">
+            ${sim.items
+              .map((it) => {
+                const isWin = it.id === sim.winner.id;
+                return `
+                <div class="card" style="padding:16px;${isWin ? 'border-color:var(--emerald-border);' : ''}">
+                  <div style="font-weight:700;color:${it.color};font-size:14px;">${it.name}</div>
+                  <div style="font-size:11.5px;color:var(--text-muted);margin:3px 0 14px;">${it.sub}</div>
+                  <div class="mono" style="display:flex;flex-direction:column;gap:7px;font-size:12px;border-top:1px solid var(--border-hairline);padding-top:12px;">
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Compute</span><span>$${it.compute.toLocaleString()}</span></div>
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Egress</span><span style="color:${it.egress === 0 ? 'var(--emerald)' : '#fff'};font-weight:${it.egress === 0 ? '700' : '400'};">$${it.egress.toLocaleString()}</span></div>
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Realtime/WS</span><span>$${it.ws.toLocaleString()}</span></div>
+                    <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-secondary);">Base / DB</span><span>$${it.base.toLocaleString()}</span></div>
+                    <div style="display:flex;justify-content:space-between;padding-top:8px;border-top:1px solid var(--border-hairline);font-size:14px;font-weight:800;color:#fff;">
+                      <span>Total</span><span>$${it.total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+              })
+              .join('')}
+          </div>
+        `;
+      }
+
+      /* --------------------------------------------------------------------
+         14. MODULE 5: PER-STACK AGENT SETUP FILES
+      -------------------------------------------------------------------- */
+      function getFormattedSetupContent(file, format) {
+        if (format === '.cursorrules') return file.content.replace('# AGENTS.md', '# .cursorrules');
+        if (format === 'GEMINI.md') return file.content.replace('# AGENTS.md', '# GEMINI.md (Gemini Neon / CLI Agent Rules)');
+        return file.content;
+      }
+
+      function renderSetupFiles() {
+        const panel = document.getElementById('panel-setup');
+        const activeFile = SETUP_FILES.find((f) => f.id === state.setupId) || SETUP_FILES[0];
+        const rawText = getFormattedSetupContent(activeFile, state.setupFormat);
+
+        panel.innerHTML = `
+          <div class="setup-layout">
+            <!-- Left Stack Selector -->
+            <div class="stack-gap" style="gap:14px;">
+              <div class="card" style="padding:18px;">
+                <span class="section-kicker">${ICONS.fileCode(13)} 7 PRODUCTION STACKS</span>
+                <h2 style="font-size:17px;font-weight:700;color:#fff;margin:4px 0 6px;">Per-Stack Agent Setup Files</h2>
+                <p style="font-size:12.5px;color:var(--text-secondary);margin-bottom:14px;">Drop into your repository root so frontier coding agents obey strict architecture rules and automated compiler verification loops.</p>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  ${SETUP_FILES.map(
+                    (f) => `
+                    <button class="pill-card ${f.id === activeFile.id ? 'selected' : ''}" data-setup-id="${f.id}" style="width:100%;">
+                      <div style="min-width:0;">
+                        <div class="mono" style="font-size:12.5px;font-weight:700;color:#fff;">${f.name}</div>
+                        <div style="font-size:11.5px;color:var(--text-secondary);margin-top:2px;">${f.subtitle}</div>
+                      </div>
+                    </button>
+                  `
+                  ).join('')}
+                </div>
+              </div>
+
+              <div class="callout-box callout-indigo">
+                <div class="mono" style="font-size:11px;font-weight:700;color:var(--indigo);margin-bottom:6px;">WHY SECTION 4 MATTERS MOST</div>
+                <p style="font-size:12.5px;color:#E2E8F0;line-height:1.5;">Every setup file embeds a <strong>Mandatory Verification Loop</strong> (e.g., <code class="mono" style="color:var(--cyan);">cargo clippy</code>, <code class="mono" style="color:var(--cyan);">tsc --noEmit</code>, <code class="mono" style="color:var(--cyan);">go test -race</code>). Agents auto-fix 90%+ of mistakes before you review a single line.</p>
+              </div>
+            </div>
+
+            <!-- Right Syntax-Styled Code Viewer -->
+            <div class="code-shell">
+              <div class="code-toolbar">
+                <div class="segmented">
+                  ${['AGENTS.md', '.cursorrules', 'GEMINI.md']
+                    .map(
+                      (fmt) => `
+                    <button class="seg-btn ${state.setupFormat === fmt ? 'active-cyan' : ''}" data-fmt="${fmt}">${fmt}</button>
+                  `
+                    )
+                    .join('')}
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="btn-secondary" id="copy-setup-btn">${ICONS.copy(14)} Copy to Clipboard</button>
+                  <button class="btn-primary" id="dl-setup-btn" style="padding:8px 14px;font-size:12.5px;">${ICONS.download(14)} Download ${state.setupFormat}</button>
+                </div>
+              </div>
+              <pre class="code-viewer">${highlightMarkdown(rawText)}</pre>
+            </div>
+          </div>
+        `;
+
+        panel.querySelectorAll('[data-setup-id]').forEach((b) =>
+          b.addEventListener('click', () => { state.setupId = b.dataset.setupId; renderSetupFiles(); })
+        );
+        panel.querySelectorAll('[data-fmt]').forEach((b) =>
+          b.addEventListener('click', () => { state.setupFormat = b.dataset.fmt; renderSetupFiles(); })
+        );
+        document.getElementById('copy-setup-btn').addEventListener('click', () => {
+          copyText(rawText, `Copied ${state.setupFormat} (${activeFile.name})`);
+        });
+        document.getElementById('dl-setup-btn').addEventListener('click', () => {
+          const blob = new Blob([rawText], { type: 'text/markdown;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = state.setupFormat;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          showToast(`Downloaded ${state.setupFormat}`);
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         15. COMMAND PALETTE (Cmd+K / Ctrl+K / '/')
+      -------------------------------------------------------------------- */
+      function buildCommandIndex() {
+        const items = [];
+        BLUEPRINTS.forEach((bp) => {
+          items.push({
+            type: 'Blueprint',
+            badge: 'badge-cyan',
+            title: bp.title,
+            sub: bp.primaryStack,
+            action: () => {
+              switchTab('bible');
+              openDrawer(bp.id);
+            }
+          });
+        });
+        RUNTIMES.forEach((rt) => {
+          items.push({
+            type: 'Runtime',
+            badge: 'badge-emerald',
+            title: rt.name,
+            sub: `Cold: ${rt.coldStart} · Verifier: ${rt.verifierScore}/100`,
+            action: () => switchTab('arena')
+          });
+        });
+        COST_PRESETS.forEach((p) => {
+          items.push({
+            type: 'Cost Preset',
+            badge: 'badge-amber',
+            title: p.label,
+            sub: 'Load scenario into Cost-at-Scale Pricing Lab',
+            action: () => {
+              state.costReqsIdx = p.reqsIdx;
+              state.costWallMs = p.wall;
+              state.costCpuPct = p.cpu;
+              state.costEgressGb = p.egress;
+              state.costWs = p.ws;
+              switchTab('cost');
+            }
+          });
+        });
+        SETUP_FILES.forEach((f) => {
+          items.push({
+            type: 'AGENTS.md',
+            badge: 'badge-indigo',
+            title: f.name,
+            sub: f.subtitle,
+            action: () => {
+              state.setupId = f.id;
+              switchTab('setup');
+            }
+          });
+        });
+        return items;
+      }
+
+      const CMD_INDEX = buildCommandIndex();
+
+      function getFilteredCommands() {
+        const q = state.cmdQuery.toLowerCase().trim();
+        if (!q) return CMD_INDEX.slice(0, 12);
+        return CMD_INDEX.filter(
+          (item) =>
+            item.title.toLowerCase().includes(q) ||
+            item.sub.toLowerCase().includes(q) ||
+            item.type.toLowerCase().includes(q)
+        ).slice(0, 14);
+      }
+
+      function renderCommandResults() {
+        const container = document.getElementById('cmd-results');
+        const list = getFilteredCommands();
+        if (state.cmdActiveIdx >= list.length) state.cmdActiveIdx = 0;
+
+        if (list.length === 0) {
+          container.innerHTML = `<div style="padding:28px;text-align:center;color:var(--text-muted);font-size:13px;">No matching blueprints, runtimes, or setup files.</div>`;
+          return;
+        }
+
+        container.innerHTML = list
+          .map(
+            (item, idx) => `
+          <button class="cmd-item ${idx === state.cmdActiveIdx ? 'active' : ''}" data-cmd-idx="${idx}">
+            <div style="min-width:0;">
+              <div style="font-size:13.5px;font-weight:600;color:#fff;" class="truncate">${escapeHtml(item.title)}</div>
+              <div class="mono truncate" style="font-size:11px;color:var(--text-muted);margin-top:2px;">${escapeHtml(item.sub)}</div>
+            </div>
+            <span class="badge ${item.badge}" style="flex-shrink:0;">${item.type}</span>
+          </button>
+        `
+          )
+          .join('');
+
+        container.querySelectorAll('.cmd-item').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const item = list[Number(btn.dataset.cmdIdx)];
+            closeCmdPalette();
+            if (item) item.action();
+          });
+        });
+      }
+
+      function openCmdPalette() {
+        state.cmdOpen = true;
+        state.cmdQuery = '';
+        state.cmdActiveIdx = 0;
+        const backdrop = document.getElementById('cmd-backdrop');
+        const input = document.getElementById('cmd-input');
+        backdrop.classList.add('open');
+        input.value = '';
+        renderCommandResults();
+        setTimeout(() => input.focus(), 20);
+      }
+
+      function closeCmdPalette() {
+        state.cmdOpen = false;
+        document.getElementById('cmd-backdrop').classList.remove('open');
+      }
+
+      /* --------------------------------------------------------------------
+         16. GLOBAL EVENT LISTENERS & KEYBOARD SHORTCUTS
+      -------------------------------------------------------------------- */
+      function initEvents() {
+        document.getElementById('open-cmd-btn').addEventListener('click', openCmdPalette);
+        document.getElementById('drawer-backdrop').addEventListener('click', closeDrawer);
+        document.getElementById('cmd-backdrop').addEventListener('click', (e) => {
+          if (e.target.id === 'cmd-backdrop') closeCmdPalette();
+        });
+
+        document.getElementById('cmd-input').addEventListener('input', (e) => {
+          state.cmdQuery = e.target.value;
+          state.cmdActiveIdx = 0;
+          renderCommandResults();
+        });
+
+        window.addEventListener('keydown', (e) => {
+          const tag = document.activeElement?.tagName;
+          const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
+
+          // Cmd+K or Ctrl+K
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            state.cmdOpen ? closeCmdPalette() : openCmdPalette();
+            return;
+          }
+
+          // Slash '/' to open palette when not typing
+          if (e.key === '/' && !isTyping && !state.cmdOpen) {
+            e.preventDefault();
+            openCmdPalette();
+            return;
+          }
+
+          // Escape closes palette or drawer
+          if (e.key === 'Escape') {
+            if (state.cmdOpen) closeCmdPalette();
+            else if (state.drawerBlueprintId) closeDrawer();
+            return;
+          }
+
+          // Command Palette arrow navigation
+          if (state.cmdOpen) {
+            const list = getFilteredCommands();
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              state.cmdActiveIdx = (state.cmdActiveIdx + 1) % Math.max(1, list.length);
+              renderCommandResults();
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              state.cmdActiveIdx = (state.cmdActiveIdx - 1 + list.length) % Math.max(1, list.length);
+              renderCommandResults();
+            } else if (e.key === 'Enter' && list[state.cmdActiveIdx]) {
+              e.preventDefault();
+              const chosen = list[state.cmdActiveIdx];
+              closeCmdPalette();
+              chosen.action();
+            }
+            return;
+          }
+
+          // Number keys 1-5 switch modules when not typing
+          if (!isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
+            const idx = Number(e.key) - 1;
+            if (idx >= 0 && idx < TABS.length) {
+              switchTab(TABS[idx].id);
+            }
+          }
+        });
+      }
+
+      /* --------------------------------------------------------------------
+         17. BOOTSTRAP APPLICATION
+      -------------------------------------------------------------------- */
+      renderNav();
+      renderDecisionEngine();
+      initEvents();
+    })();
+  </script>
+</body>
+</html>

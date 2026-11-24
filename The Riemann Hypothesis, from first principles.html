@@ -1,0 +1,191 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>The Riemann Hypothesis, from first principles</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{background:#0B0F19;color:#cbd5e1;font-family:Georgia,'Times New Roman',serif;margin:0}.g{background:rgba(255,255,255,.05);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:1rem}.ui{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}input[type=range]{width:100%}button:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}svg text{font-family:system-ui,sans-serif}</style></head>
+<body><div id="root"></div>
+<script>
+const {useState,useEffect,useMemo}=React,h=React.createElement;
+const CY='#22d3ee',AM='#fbbf24',VI='#a78bfa',EM='#34d399';
+const Z=[14.134725,21.022040,25.010858,30.424876,32.935062,37.586178,40.918719,43.327073,48.005151,49.773832,52.970321,56.446248,59.347044,60.831779,65.112544,67.079811,69.546402,72.067158,75.704691,77.144840,79.337375,82.910381,84.735493,87.425275,88.809111,92.491899,94.651344,95.870634,98.831194,101.317851,103.725538,105.446623,107.168611,111.029536,111.874659,114.320221,116.226680,118.790783,121.370125,122.946829];
+const isP=n=>{if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true};
+const PR=(()=>{const N=50000,s=new Uint8Array(N+1),r=[];for(let i=2;i<=N;i++)if(!s[i]){r.push(i);for(let j=i*i;j<=N;j+=i)s[j]=1}return r})();
+const lam=n=>{for(let p=2;p<=n;p++)if(n%p===0){let m=n;while(m%p===0)m/=p;return m===1?Math.log(p):0}return 0};
+const PS=[0,0];for(let n=2;n<=70;n++)PS[n]=PS[n-1]+lam(n);
+const Sec=({n,t,a,d,children})=>h('section',{className:'space-y-6'},h('div',{className:'ui text-sm text-slate-400'},'Chapter '+n+' of 5'),h('h1',{className:'text-3xl sm:text-4xl text-white leading-tight'},t),h('p',{className:'text-lg leading-8 max-w-3xl'},a),children);
+const G=(c,...k)=>h('div',{className:'g p-4 sm:p-5 '+c},...k);
+const Sl=({l,v,set,min,max,step,c,f})=>h('label',{className:'block ui text-sm'},h('div',{className:'flex justify-between mb-1'},h('span',null,l),h('b',{style:{color:c}},f?f(v):v)),h('input',{type:'range',min,max,step,value:v,onChange:e=>set(+e.target.value),style:{accentColor:c}}));
+const Bt=({on,c,children,cl})=>h('button',{onClick:on,className:'ui px-4 py-2 rounded-lg text-sm border border-white/15 hover:bg-white/10 transition '+(cl||''),style:c?{color:c}:null},children);
+
+function Ch1({d}){
+ const[S,setS]=useState([]);
+ const out=n=>S.some(p=>p!==n&&n%p===0);
+ const al=[];for(let n=2;n<=200;n++)if(!out(n))al.push(n);
+ const gp=al.slice(1).map((n,i)=>n-al[i]),mx=Math.max(...gp,1);
+ const done=[2,3,5,7,11,13].every(p=>S.includes(p));
+ const click=n=>{if(isP(n)&&!S.includes(n)&&!out(n))setS([...S,n])};
+ const cells=[];for(let n=1;n<=200;n++){const dead=n===1||out(n),sel=S.includes(n);
+  cells.push(h('button',{key:n,onClick:()=>click(n),'aria-label':String(n),className:'ui aspect-square text-[9px] sm:text-xs rounded transition '+(dead?'text-slate-700 line-through':sel?'bg-amber-400 text-black font-bold':done?'bg-cyan-400/20 text-cyan-300':'text-slate-200 hover:bg-white/10')},n))}
+ const w=600/Math.max(gp.length,1);
+ return h(Sec,{n:1,t:'The atoms of numbers',d,a:[
+ 'Every whole number is built by multiplying prime numbers: 12 = 2 × 2 × 3. Primes are the periodic table of arithmetic. Yet list them and the pattern looks random. Start by clicking 2, then 3, then the next number left standing, and watch their multiples vanish.',
+ 'By unique factorisation every integer is a product of primes. The prime number theorem says primes near x have density 1/ln x, yet individual gaps fluctuate wildly (Cramér’s model treats gaps as exponentially distributed with mean ln x).',
+ 'PNT: π(x) ~ x/ln x. Bounded gaps are known (Zhang, Maynard–Tao: gaps ≤ 246 infinitely often), but even the Cramér bound p(n+1) − p(n) = O(√p · ln p) is only known under RH.'][d]},
+ G('',h('div',{className:'grid gap-1',style:{gridTemplateColumns:'repeat(20,minmax(0,1fr))'}},cells),
+  h('div',{className:'flex gap-2 mt-4 flex-wrap'},h(Bt,{on:()=>setS([2,3,5,7,11,13]),c:AM},'Sieve automatically'),h(Bt,{on:()=>setS([])},'Reset'))),
+ G('',h('div',{className:'ui text-sm mb-2'},'Gaps between neighbouring survivors: ',h('b',{style:{color:CY}},gp.length),' gaps, largest ',h('b',{style:{color:AM}},Math.max(...gp,0))),
+  h('svg',{viewBox:'0 0 600 120',className:'w-full'},gp.map((g,i)=>h('rect',{key:i,x:i*w,y:120-g/mx*110,width:Math.max(w-1,1),height:g/mx*110,fill:done?CY:'#64748b'}))),
+  h('p',{className:'ui text-sm text-slate-400 mt-2'},done?['Every bar is a gap between two primes. Some are 2 (twin primes), some are far taller. Why this jumble? That is the question.','Gaps 2 (twin primes), 4, 6 recur but with no closed-form rule; mean gap near x ≈ ln x.','Variance and tail of gaps are governed by the zeros of ζ; see Chapter 4.'][d]:'Clean the grid and the bars become the real prime gaps.')),
+ G('border-cyan-400/40',h('div',{className:'ui font-semibold mb-1',style:{color:CY}},'Where this leads'),h('p',{className:'leading-7'},['We now know what we are up against: every number is built from primes, yet the primes themselves seem to follow no pattern. To get a grip, we need a smooth quantity that secretly depends on every prime. In the next chapter we build one, piece by piece, and meet the bridge Euler found between all the whole numbers and the primes alone.','The primes are the multiplicative building blocks of ℤ, but their distribution looks irregular. Analysis handles smooth objects well, so the plan is to encode the primes in a function we can study with calculus. Euler’s series and its product over primes (Chapter 2) is the first such encoding.','Goal: convert multiplicative structure into analytic structure. Dirichlet series turn Dirichlet convolution into multiplication; ζ(s) = Σ n⁻ˢ generates the constant function 1, and its Euler product encodes unique factorisation (Chapter 2).'][d])));
+}
+
+const fac=n=>{const f=[];for(let p=2;n>1;p++)while(n%p===0){f.push(p);n/=p}return f};
+const Hd=t=>h('h2',{className:'text-xl text-white mb-2'},t);
+const Pp=k=>h('p',{className:'leading-7 mb-3'},k);
+const Nt=(d,a)=>d?h('p',{className:'ui text-xs text-slate-400 mt-3 leading-5'},a[d-1]):null;
+function Ch2({d}){
+ const[s,setS]=useState(2),[L,setL]=useState(2),[n,setN]=useState(12),[P,setP]=useState([2,3]);
+ const w=x=>Math.pow(x,-s),pr=PR.filter(p=>p<=47),F=v=>v>=.001?v.toFixed(5):v.toExponential(3);
+ const r=useMemo(()=>{const N=Math.round(Math.pow(10,L));let a=0;for(let i=1;i<=N;i++)a+=Math.pow(i,-s);let b=1;for(const p of PR){if(p>N)break;b/=1-Math.pow(p,-s)}
+  const M=50000;let z=0;for(let i=1;i<=M;i++)z+=Math.pow(i,-s);z+=Math.pow(M,1-s)/(s-1)-.5*Math.pow(M,-s);return{N,a,b,z}},[s,L]);
+ const f=fac(n),pw=f.reduce((a,p)=>a*w(p),1);
+ let g=0;for(let i=0;i<80;i++)g+=Math.pow(w(2),i);
+ const built=m=>m===1||fac(m).every(p=>P.includes(p));
+ let nb=0;const cells=[];for(let m=1;m<=48;m++){const b=built(m);if(b)nb++;cells.push(h('div',{key:m,className:'ui text-xs text-center py-1.5 rounded '+(b?'bg-cyan-400/25 text-cyan-200':'text-slate-600')},m))}
+ const bars=[];for(let m=1;m<=10;m++){const bh=w(m)*62,x=25+(m-1)*38;bars.push(h('g',{key:m},h('rect',{x:x-13,y:76-bh,width:26,height:bh,fill:AM,rx:2}),h('text',{x,y:92,fill:'#94a3b8',fontSize:11,textAnchor:'middle'},m),h('text',{x,y:72-bh,fill:'#e2e8f0',fontSize:9,textAnchor:'middle'},w(m)<.005?'≈0':w(m).toFixed(2))))}
+ const Mt=(t,v,c,sub)=>G('',h('div',{className:'ui text-sm text-slate-400'},t),h('div',{className:'text-3xl my-2',style:{color:c}},v.toFixed(6)),h('div',{className:'h-3 rounded bg-white/10 overflow-hidden'},h('div',{className:'h-full',style:{width:Math.max(0,Math.min(100,(v-1)/(r.z-1)*100))+'%',background:c}})),h('div',{className:'ui text-xs text-slate-400 mt-2'},sub));
+ return h(Sec,{n:2,t:'The bridge from all numbers to primes',d,a:[
+ 'In Chapter 1 we hit a puzzle: primes look random, yet every number is built from them. To study something that jagged, we look for a smooth quantity that secretly depends on every prime. Euler found one: a single number that can be computed in two completely different ways, once from all the whole numbers and once from the primes alone. Like a Rosetta Stone, it is one message written in two languages. Let’s build it piece by piece.',
+ 'Goal: encode the primes in an analytic object we can differentiate, integrate and extend. Euler’s series ζ(s) = Σ n⁻ˢ is such an object, and unique factorisation turns it into a product over primes. The steps below build that identity from its parts.',
+ 'Goal: an analytic handle on the multiplicative structure of ℤ. The Euler product ζ(s) = Π (1 − p⁻ˢ)⁻¹ is the prototype for every L-function, and the continuation, zeros and explicit formula of later chapters all flow from this one identity. Each ingredient is made explicit below.'][d]},
+ G('',Hd('Step 1: give every number a weight'),Pp('Choose a dial, s. Every whole number n gets a weight: the bigger the number, the smaller its weight, and the higher you turn the dial, the faster the weights shrink. With the dial at 2, the weight of 3 is 1 ÷ (3 × 3) = 1/9. The bars show the weights of 1 to 10 at your setting.'),
+  h(Sl,{l:d?'Dial s':'The dial (s)',v:s,set:setS,min:1.2,max:5,step:.05,c:AM,f:x=>x.toFixed(2)}),h('svg',{viewBox:'0 0 400 100',className:'w-full max-w-xl mt-2'},bars),
+  Nt(d,['Weight of n: w(n) = n⁻ˢ = 1/nˢ. We keep s real and above 1 for now; complex s arrives in Chapter 3.','Key property: w is completely multiplicative, w(mn) = w(m)w(n). Step 2 depends on exactly this.'])),
+ G('',Hd('Step 2: a number’s weight is built from its primes'),Pp('Chapter 1 showed that every number has a unique recipe of primes. Here is the key surprise: its weight follows the same recipe. Multiply the weights of the prime ingredients and you get exactly the weight of the number. So everything about the weights of all numbers is already contained in the weights of the primes.'),
+  h(Sl,{l:'Pick a number',v:n,set:setN,min:2,max:60,step:1,c:CY}),
+  h('div',{className:'ui mt-3 space-y-1 text-sm'},h('div',null,'Recipe: ',h('b',{style:{color:CY}},f.length>1?n+' = '+f.join(' × '):n+' is prime, so it is its own recipe')),
+   h('div',null,'Ingredient weights multiplied: ',h('b',{style:{color:AM}},f.map(p=>F(w(p))).join(' × ')+' = '+F(pw))),
+   h('div',null,'Weight of '+n+' directly: ',h('b',{style:{color:EM}},F(w(n))+'  ✓ identical'))),
+  Nt(d,['Complete multiplicativity: n⁻ˢ = Π p_i⁻ˢ over the prime factorisation of n.','A Dirichlet series with completely multiplicative coefficients always has an Euler product; this is the structural reason behind ζ’s factorisation.'])),
+ G('',Hd('Step 3: Machine B gives each prime its own switch'),Pp('Machine B lets each prime be used any number of times: 1, 2, 4, 8, … for the prime 2. Switch primes on and watch which numbers can now be built. Switch on every prime and every number appears, each exactly once, because each number has only one prime recipe.'),
+  h('div',{className:'flex flex-wrap gap-1.5 mb-3'},pr.map(p=>h('button',{key:p,onClick:()=>setP(P.includes(p)?P.filter(x=>x!==p):[...P,p]),'aria-pressed':P.includes(p),className:'ui px-2.5 py-1 rounded-md text-sm border '+(P.includes(p)?'bg-amber-400 text-black border-amber-400':'border-white/15 hover:bg-white/10')},p)),h(Bt,{on:()=>setP(pr),c:AM},'All primes'),h(Bt,{on:()=>setP([])},'Clear')),
+  h('div',{className:'grid gap-1',style:{gridTemplateColumns:'repeat(12,minmax(0,1fr))'}},cells),
+  h('p',{className:'ui text-sm mt-2',style:{color:nb===48?EM:slate}},nb===48?'All 48 numbers are built, each exactly once.':nb+' of 48 numbers built so far. Keep switching primes on.'),
+  h('p',{className:'leading-7 mt-4'},'Adding up the weights of just the powers of 2 (1, 2, 4, 8, …) has a neat shortcut: 1 + w + w² + … = 1 ÷ (1 − w), where w is the weight of 2. At your dial: ',h('b',{style:{color:AM}},g.toFixed(6)),' = ',h('b',{style:{color:AM}},(1/(1-w(2))).toFixed(6)),'. One simple factor per prime packs in all its powers.'),
+  Nt(d,['Expanding Π (1 + p⁻ˢ + p⁻²ˢ + …) and collecting terms yields each n⁻ˢ exactly once, by unique factorisation; each geometric factor equals (1 − p⁻ˢ)⁻¹.','Absolute convergence for Re s > 1 justifies the rearrangement. Σ p⁻ˢ converges iff s > 1, so the product’s behaviour as s → 1⁺ re-proves that primes are infinite.'])),
+ G('',Hd('Step 4: run both machines and watch them agree'),Pp('Machine A adds the weights of 1, 2, 3, … up to the limit you choose. Machine B multiplies one factor per prime up to the same limit, each factor being 1 ÷ (1 − weight of that prime). The more terms you allow, the closer both get to the same target.'),
+  h(Sl,{l:d?'Terms used: n up to':'How far to go: numbers up to',v:L,set:setL,min:1,max:4.7,step:.05,c:CY,f:()=>r.N.toLocaleString()}),
+  h('div',{className:'grid sm:grid-cols-2 gap-4 mt-4'},Mt(d?'A: Σ 1/nˢ':'Machine A: add all numbers',r.a,AM,'Adds '+r.N.toLocaleString()+' terms'),Mt(d?'B: Π 1/(1 − p⁻ˢ)':'Machine B: multiply primes only',r.b,CY,'Uses '+PR.filter(p=>p<=r.N).length.toLocaleString()+' primes')),
+  h('p',{className:'ui text-sm mt-3'},h('span',{style:{color:EM}},'Target: '+r.z.toFixed(6)),'. Both bars start empty and fill toward it as you allow more terms.'),
+  Nt(d,['A_N = Σ_{n≤N} n⁻ˢ and B_N = Π_{p≤N}(1 − p⁻ˢ)⁻¹ both increase to ζ(s); the target here uses Euler–Maclaurin.','Truncation errors decay like N^(1−s) up to log factors, so convergence stalls as s → 1⁺, the pole of ζ.'])),
+ G('border-emerald-400/40',h('div',{className:'ui font-semibold mb-1',style:{color:EM}},'What we gained, and the catch'),Pp('We now have one function that is a sum over all numbers and a product over primes, so every prime sits inside it. The catch: it only works while the dial is above 1. At 1 and below, Machine A explodes; slide the dial toward 1.2 and watch the bars crawl. That barrier is the Wall. The next chapter asks what lies beyond it.'),Nt(d,['ζ(s) has a simple pole at s = 1 and the series diverges for s ≤ 1.','Analytic continuation across Re s = 1 (Riemann, 1859) is what makes the zeros accessible.'])));
+}
+
+function Ch3({d}){
+ const[k,setK]=useState(5);
+ const X=re=>re<0?250+re*28:250+re*210,Y=im=>400-im/55*390;
+ const lab=(x,y,t,c,a)=>h('text',{x,y,fill:c,fontSize:13,textAnchor:a||'middle'},t);
+ return h(Sec,{n:3,t:'Stepping off the map',d,a:[
+ 'Euler’s formula breaks past the Wall: the sum explodes. Riemann fed in two-dimensional numbers, points on a map (across and up), and found a smooth way to continue the landscape beyond the Wall. Where it touches sea level we find zeros.',
+ 'ζ extends meromorphically to ℂ with one simple pole at s = 1. The functional equation ζ(s) = 2ˢπˢ⁻¹ sin(πs/2) Γ(1−s) ζ(1−s) gives trivial zeros at −2, −4, … and symmetry ρ ↔ 1 − ρ across Re s = ½.',
+ 'ξ(s) = ½ s(s−1) π^(−s/2) Γ(s/2) ζ(s) is entire of order 1 with ξ(s) = ξ(1−s). N(T) ~ (T/2π) ln(T/2π). Over 10¹³ zeros are verified on the line (Gourdon, Platt–Trudgian); GRH asserts the same for all L-functions.'][d]},
+ G('',h('svg',{viewBox:'0 0 720 420',className:'w-full'},
+  h('rect',{x:X(1),y:0,width:720-X(1),height:400,fill:CY,opacity:.09}),h('rect',{x:X(0),y:0,width:X(1)-X(0),height:400,fill:VI,opacity:.16}),
+  h('line',{x1:X(1),x2:X(1),y1:0,y2:400,stroke:AM,strokeWidth:2}),h('line',{x1:X(.5),x2:X(.5),y1:32,y2:400,stroke:EM,strokeWidth:2,strokeDasharray:'7 6'}),h('line',{x1:0,x2:720,y1:400,y2:400,stroke:'#475569'}),
+  lab(X(1.5),30,'Safe zone',CY),lab(X(1.5),48,'Euler works here',CY),lab(X(.5),20,'Mystery strip',VI),lab(X(1)+4,200,'The Wall',AM,'start'),
+  lab(X(.5)+6,386,d?'Re(s) = ½':'dead centre',EM,'start'),lab(X(-4),380,'Trivial zeros',slate),
+  [-2,-4,-6].map(v=>h('circle',{key:v,cx:X(v),cy:400,r:6,fill:'#e2e8f0'})),
+  Z.slice(0,k).map((g,i)=>h('circle',{key:i,cx:X(.5),cy:Y(g),r:6,fill:VI,stroke:'#fff',strokeWidth:1.5}))),
+  h('div',{className:'mt-3'},h(Sl,{l:'Non-trivial zeros revealed',v:k,set:setK,min:1,max:10,step:1,c:VI})),
+  h('p',{className:'ui text-xs text-slate-400 mt-2'},(d?'Heights t = ':'Heights up the map: ')+Z.slice(0,k).map(x=>x.toFixed(3)).join(', ')+(d?'  (mirror images at −t not drawn). ':'. ')+'The far left is squeezed to fit.')),
+ G('border-emerald-400/50',h('div',{className:'ui text-sm',style:{color:EM}},'The Riemann Hypothesis'),h('p',{className:'text-xl text-white mt-1 leading-8'},d?'Every non-trivial zero of ζ(s) has real part exactly ½.':'Every single non-trivial zero lies dead-centre on the dashed line. Not one ever drifts left or right.'),h('p',{className:'ui text-sm mt-2 text-slate-400'},'So far every zero ever computed obeys it. No one can prove that all of them do.')));
+}
+const slate='#94a3b8';
+
+function Ch4({d}){
+ const[k,setK]=useState(0),[sg,setSg]=useState(.5);
+ const X=x=>40+(x-2)/68*660,Y=y=>335-Math.max(-5,Math.min(88,y))/90*320;
+ const rec=x=>{const lx=Math.log(x);let S=0;for(let i=0;i<k;i++){const g=Z[i],f=s=>Math.pow(x,s)*(s*Math.cos(g*lx)+g*Math.sin(g*lx))/(s*s+g*g);S+=i===0?.5*f(sg)+.5*f(1-sg):f(.5)}return x-2*S-Math.log(2*Math.PI)-.5*Math.log(1-1/(x*x))};
+ const curve=useMemo(()=>{let p='';for(let x=2;x<=70;x+=.25)p+=(p?'L':'M')+X(x)+' '+Y(rec(x));return p},[k,sg]);
+ const sp=(()=>{let q='';const g=Z[0];for(let x=2;x<=70;x+=.5){const lx=Math.log(x),f=s=>Math.pow(x,s)*(s*Math.cos(g*lx)+g*Math.sin(g*lx))/(s*s+g*g),y=-2*(.5*f(sg)+.5*f(1-sg));q+=(q?'L':'M')+X(x)+' '+(60-Math.max(-55,Math.min(55,y*4.5)))}return q})();
+ let st='M'+X(2)+' '+Y(0);for(let n=2;n<=70;n++)st+='L'+X(n)+' '+Y(PS[n-1])+'L'+X(n)+' '+Y(PS[n]);
+ return h(Sec,{n:4,t:'The music of the primes',d,a:[
+ 'Each zero is a tuning fork: its height sets the pitch and its position sets the loudness. Add the notes together and a smooth ramp turns into the exact staircase of primes. Drag the first slider up. Then try nudging one zero off the line.',
+ 'Explicit formula: ψ(x) = x − Σ_ρ x^ρ/ρ − ln 2π − ½ ln(1 − x⁻²). For ρ = σ + iγ each term has size x^σ/|ρ| and oscillates like cos(γ ln x). ψ jumps by ln p at each prime power.',
+ 'von Mangoldt’s formula. RH ⇔ ψ(x) = x + O(√x ln²x) ⇔ π(x) = Li(x) + O(√x ln x). A zero with σ > ½ forces oscillations of size Ω(x^σ). Montgomery’s pair correlation ties zero spacings to GUE statistics.'][d]},
+ G('',h('svg',{viewBox:'0 0 720 360',className:'w-full'},
+  h('line',{x1:40,x2:700,y1:335,y2:335,stroke:'#475569'}),
+  h('line',{x1:X(2),y1:Y(2),x2:X(70),y2:Y(70),stroke:'#e2e8f0',strokeWidth:1.5,strokeDasharray:'5 5',opacity:.6}),
+  h('path',{d:st,fill:'none',stroke:CY,strokeWidth:2}),
+  h('path',{d:curve,fill:'none',stroke:sg>.5?VI:AM,strokeWidth:2.5}),
+  h('text',{x:48,y:22,fill:CY,fontSize:13},'Prime staircase'+(d?' ψ(x)':'')),h('text',{x:48,y:40,fill:'#e2e8f0',fontSize:13},'Smooth guess: a straight ramp'),h('text',{x:48,y:58,fill:AM,fontSize:13},'Rebuilt from '+k+' zeros'))),
+ G('grid sm:grid-cols-2 gap-5',
+  h(Sl,{l:d?'Zeros added (γ₁ ≈ 14.13, γ₂ ≈ 21.02, …)':'Notes added',v:k,set:setK,min:0,max:40,step:1,c:AM}),
+  h('div',null,h(Sl,{l:d?'Real part σ of the first zero':'Push the first zero off the line',v:sg,set:setSg,min:.5,max:.95,step:.01,c:VI,f:x=>x.toFixed(2)}),
+   h('p',{className:'ui text-xs mt-2',style:{color:sg>.5?VI:slate}},sg>.5?'Its wave now grows like x'+(d?'^'+sg.toFixed(2):' to a higher power')+', about '+(Math.pow(70,sg)/Math.pow(70,.5)).toFixed(1)+'× louder than before at x = 70. Keep going and it swamps the staircase.':'On the line: all waves stay calm.'))),
+ G('',h('div',{className:'ui text-sm mb-1'},d?'Contribution of the first zero alone (fixed vertical scale)':'The first note on its own (same scale every time)'),h('svg',{viewBox:'0 0 720 120',className:'w-full'},h('line',{x1:40,x2:700,y1:60,y2:60,stroke:'#475569'}),h('path',{d:sp,fill:'none',stroke:sg>.5?VI:AM,strokeWidth:2.5})),h('p',{className:'ui text-xs text-slate-400'},'On the line it stays small. Drag the zero away and watch it swell as x grows.')));
+}
+
+function Ch5({d}){
+ const[on,setOn]=useState(false);
+ const cards=[
+ {t:'Prime counting precision',b:'Today the error band in counting primes is huge and loosely known.',a:'The error is pinned to about √x · ln x, the sharpest it can be.',n:['Unconditional: π(x) − Li(x) = O(x·e^(−c√ln x)). Under RH: |π(x) − Li(x)| < (√x ln x)/8π for x ≥ 2657.','Equivalent to RH itself; this is also why prime-gap bounds O(√p ln p) follow.']},
+ {t:'Algorithms and security',b:'Deterministic primality tests are only proven fast by other means.',a:'RSA is not broken: factoring is untouched. The Generalized RH would make the classical Miller test provably polynomial.',n:['Miller (1976): GRH ⇒ deterministic polynomial-time primality. AKS (2002) already achieves this without GRH, just more slowly in practice.','Factoring hardness is not implied by or against RH; no cryptosystem falls.']},
+ {t:'Physics meets pure math',b:'Zero spacings resemble nuclear energy levels, but no one knows why.',a:'The pattern would be explained by a hidden physical law behind the primes.',n:['Montgomery–Odlyzko: zero statistics match GUE eigenvalues of random Hermitian matrices.','Hilbert–Pólya: find a self-adjoint operator whose spectrum is {γ}. Self-adjoint ⇒ real γ ⇒ RH. Berry–Keating H = xp is a candidate.']},
+ {t:'The domino cascade',b:'Hundreds of papers say: “assuming RH is true…”',a:'All of them become unconditional theorems at once.',n:['Tighter gaps between primes, least prime in progressions, Dirichlet L-function bounds: all conditional on RH/GRH today.','GRH extends to every L-function; it would settle Artin’s conjecture, Chebotarev bounds and more.']}];
+ return h(Sec,{n:5,t:'What proving it unlocks',d,a:[
+ 'A $1,000,000 Millennium Prize waits for a proof, and mathematicians have already written hundreds of results that begin “Assuming the Riemann Hypothesis is true…”. Flip the switch to see what a proof would turn on.',
+ 'RH is a Clay Millennium Problem (2000). Many theorems are stated conditionally on it; a proof converts them to unconditional results and sharpens every explicit estimate in prime number theory.',
+ 'Proof would lock in optimal error terms for π(x), GRH-dependent algorithms, and a spectral explanation (Hilbert–Pólya, Connes’ trace formula approach, function-field analogue by Weil/Deligne already proved).'][d]},
+ h('button',{onClick:()=>setOn(!on),className:'ui self-start flex items-center gap-3 g px-4 py-3 text-sm','aria-pressed':on},h('span',{className:'w-12 h-6 rounded-full relative transition',style:{background:on?EM:'#334155'}},h('span',{className:'absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all',style:{left:on?'26px':'2px'}})),on?'RH proven true':'Unproven, conditional'),
+ h('div',{className:'grid sm:grid-cols-2 gap-4'},cards.map((c,i)=>h('div',{key:i,className:'g p-5 transition-all duration-500',style:{borderColor:on?EM:'rgba(255,255,255,.1)',boxShadow:on?'0 0 24px rgba(52,211,153,.25)':'none'}},
+  h('div',{className:'ui font-semibold mb-2',style:{color:on?EM:slate}},c.t),on?h('div',null,h('p',{className:'ui text-xs text-slate-500 mb-1'},'Before: '+c.b),h('p',{className:'text-base leading-7'},c.a)):h('p',{className:'text-base leading-7'},c.b),d?h('p',{className:'ui text-xs mt-3 text-slate-400 leading-5'},c.n[d-1]):null))),h(Life,{d}));
+}
+
+function Life({d}){
+ const[bits,setBits]=useState(1024);
+ const tries=Math.round(bits*Math.LN2/2);
+ const C=[
+ {t:'Your online security',c:CY,x:[
+  'When you shop or message online, your device creates secret keys from huge prime numbers, and finding a suitable prime is like panning for gold. A rule about how thinly primes spread out among big numbers, proved using this very zeta function, tells the computer how long to search. Proving the Riemann Hypothesis would not unlock these locks.',
+  'RSA and Diffie–Hellman need random primes of 1,000+ bits. The prime number theorem, proved by showing ζ(s) ≠ 0 on the line Re s = 1, says a random n-bit number is prime with probability about 1/(n ln 2). RH would sharpen the error term, but it would not make factoring any easier.',
+  'Key generation uses randomized Miller–Rabin, so correctness does not hinge on RH. Under GRH, Miller’s test becomes deterministic (Bach: witnesses up to 2 ln² n suffice), while AKS already gives unconditional polynomial time. Security rests on factoring and discrete-log hardness, independent of RH. A proven RH analogue for curves (Hasse, Weil) already pins down the point counts used when choosing elliptic-curve parameters.']},
+ {t:'Everyday technology built on primes',c:AM,x:[
+  'Primes also work behind the scenes in codes that let a scratched disc or a smudged QR code still be read, and in the way computers file data into fast lookup tables. None of this needs the Riemann Hypothesis, but all of it needs a good understanding of how primes behave.',
+  'Number systems built from primes underlie Reed–Solomon codes in QR codes, CDs and deep-space links. Hash tables and pseudorandom generators often use prime moduli, and prime-length FFTs (Rader’s algorithm) lean on primes too. Sharper prime bounds mainly turn average-case comfort into worst-case guarantees on how far apart such primes can be.',
+  'Applications need primes of special shape: NTT-friendly p = k·2ⁿ + 1, safe primes, primes in arithmetic progressions. Under GRH the least prime p ≡ a (mod q) is O((φ(q) ln q)²), giving provable worst-case search times; unconditionally only weaker Linnik-type exponents are known.']},
+ {t:'Science and physics',c:VI,x:[
+  'The zeros behave like the energy levels of heavy atomic nuclei: the spacing between them follows the same statistical pattern physicists see in those nuclei. No one knows why. If a proof explained it, it could reveal a hidden link between numbers and the physical world.',
+  'Zeta values already appear in physics: ζ(4) = π⁴/90 enters the Stefan–Boltzmann law for blackbody radiation, and zeta regularisation yields the Casimir force between plates. Separately, Montgomery and Odlyzko found that spacings between zeros follow random-matrix (GUE) statistics, as seen in quantum chaos and nuclear spectra.',
+  'Hilbert–Pólya: a self-adjoint operator with spectrum {γₙ} would prove RH; Berry–Keating (H ≈ xp) and Connes’ noncommutative-geometry approach are candidates. Katz–Sarnak symmetry types classify low-lying zero statistics across families of L-functions, and the same random-matrix ensembles drive models in nuclear physics and wireless channel capacity.']},
+ {t:'What a proof would change for you',c:EM,x:[
+  'Honest answer: not your phone, your bank or your passwords. What changes is certainty. Hundreds of “if RH is true” results would become facts, experts could stop hedging, and the new ideas needed for a proof would likely spread to other fields, as happened after Fermat’s Last Theorem was solved.',
+  'A proof would convert a long list of conditional theorems into unconditional ones, give the sharpest possible error in counting primes, and likely introduce techniques that carry over to other zeta and L-functions. It would not break RSA or any other cipher.',
+  'RH alone covers ζ; many algorithmic results need GRH for Dirichlet L-functions, which a proof of RH would not by itself settle. Long-term gains: new analytic or spectral machinery and cleaner explicit estimates (e.g. Robin: RH ⇔ σ(n) < eᵞ n ln ln n for n > 5040). A disproof, a zero off the line, would matter just as much, overturning heuristics about prime regularity, though still not any cryptosystem.']}];
+ const lead=['Short answer: nothing in your day changes if the Riemann Hypothesis is proven tomorrow. Longer answer: the same primes it studies quietly protect your online life, and a proof would turn a very strong guess into a certainty and sharpen the tools built on top of it.',
+  'A proof would not alter any deployed system today. Its impact is structural: it converts heuristics into guarantees, tightens error terms used across number theory, and reinforces the theory beneath cryptography, signal processing and physics.',
+  'No deployed system depends on RH for its security or correctness. The stakes are conditional results becoming unconditional, sharper prime-distribution bounds for search and complexity analyses, spectral and physical explanations of the zeros, and methods that migrate to other L-functions.'][d];
+ const chips=[['Will it break encryption?','No. Factoring is a different problem, and no cipher depends on RH being false.'],['Will it change my day tomorrow?','Not directly. Phones, banks and passwords keep working exactly as before.'],['Does it still matter?','Yes. It turns a strong belief into a certainty, and the ideas needed would likely spread.']];
+ return h('section',{className:'space-y-5 pt-6'},
+  h('h2',{className:'text-2xl sm:text-3xl text-white'},'What this means for real life'),
+  h('p',{className:'text-lg leading-8 max-w-3xl'},lead),
+  h('div',{className:'grid sm:grid-cols-3 gap-3'},chips.map((c,i)=>h('div',{key:i,className:'g p-4'},h('div',{className:'ui text-sm font-semibold text-white mb-1'},c[0]),h('p',{className:'ui text-sm text-slate-400 leading-6'},c[1])))),
+  h('div',{className:'grid sm:grid-cols-2 gap-4'},C.map((c,i)=>h('div',{key:i,className:'g p-5'},h('div',{className:'ui font-semibold mb-2',style:{color:c.c}},c.t),h('p',{className:'leading-7'},c.x[d]),
+   i===0?h('div',{className:'mt-4 border-t border-white/10 pt-3'},h(Sl,{l:d?'Prime size in bits':'How big a prime? (in bits)',v:bits,set:setBits,min:256,max:4096,step:256,c:CY,f:x=>x.toLocaleString()}),h('p',{className:'ui text-sm mt-2'},'A computer finds one by testing about ',h('b',{style:{color:CY}},tries.toLocaleString()),' random odd numbers'+(d?' (≈ ½ ln 2ⁿ).':'.'),' A typical RSA-2048 key uses two primes of 1,024 bits.')):null))));
+}
+
+class EB extends React.Component{constructor(p){super(p);this.state={e:null}}static getDerivedStateFromError(e){return{e}}render(){return this.state.e?h('div',{className:'g p-5 ui text-sm'},h('p',{className:'text-white mb-2'},'This chapter hit a problem while drawing.'),h('p',{className:'text-slate-400 mb-3'},String(this.state.e&&this.state.e.message)),h(Bt,{on:()=>this.setState({e:null})},'Try again')):this.props.children}}
+const NAMES=['Atoms of numbers','The bridge','Off the map','Music of primes','What it unlocks'],DEPTH=['First principles','STEM','Researcher'],CH=[Ch1,Ch2,Ch3,Ch4,Ch5];
+function App(){
+ const[c,setC]=useState(0),[d,setD]=useState(0);
+ useEffect(()=>{try{window.scrollTo(0,0);document.documentElement.scrollTop=0}catch(e){}},[c]);
+ const V=CH[c];
+ return h('div',{className:'min-h-screen'},
+  h('header',{className:'sticky top-0 z-20 g rounded-none border-x-0 border-t-0 px-4 py-3'},h('div',{className:'max-w-5xl mx-auto ui flex flex-wrap items-center gap-3 justify-between'},
+   h('div',{className:'flex gap-1 flex-wrap'},NAMES.map((n,i)=>h('button',{key:i,onClick:()=>setC(i),'aria-current':i===c,className:'px-3 py-1.5 rounded-full text-sm transition '+(i===c?'bg-cyan-400/20 text-cyan-300':i<c?'text-emerald-300':'text-slate-400 hover:text-white')},(i+1)+'. '+n))),
+   h('div',{className:'flex rounded-lg overflow-hidden border border-white/15'},DEPTH.map((n,i)=>h('button',{key:i,onClick:()=>setD(i),'aria-pressed':i===d,className:'px-3 py-1.5 text-sm transition '+(i===d?'bg-amber-400 text-black font-semibold':'hover:bg-white/10')},n))))),
+  h('main',{className:'max-w-5xl mx-auto px-4 py-10 space-y-6'},h(EB,{key:c},h(V,{d})),
+   h('div',{className:'flex justify-between pt-6'},h(Bt,{on:()=>c>0&&setC(c-1),cl:c===0?'invisible':''},'← Back'),c<4?h(Bt,{on:()=>setC(c+1),c:CY,cl:'bg-cyan-400/10'},'Next chapter →'):h('span',{className:'ui text-sm text-slate-400 self-center'},'That is the frontier. Go back and try the other depth levels.'))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script></body></html>
